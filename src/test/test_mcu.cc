@@ -30,7 +30,14 @@ TEST_F (RV32CoreTest, SLTIU) {
 }
 
 TEST_F (RV32CoreTest, XORI) {
-	FAIL();
+	// load x1 with 0xFF00F00F
+	// XOR it with 0x0FF
+	// should be 0xFF00F0F0
+
+	set_register(1, 0xFF00F00F);
+	// XORI x1, x1, 0x0FF
+	execute(0b00001111111100001100000010010011);
+	ASSERT_EQ(0xFF00F0F0, get_register(1));
 }
 
 TEST_F (RV32CoreTest, SRLI) {

@@ -270,8 +270,7 @@ void RV32Core::execute_OP_IMM(uint32_t insn) {
 	} break;
 	case 4: // XORI
 	{
-		// TODO
-		illegal_instruction();
+		set_register(rd, get_register(rs1) ^ imm);
 	} break;
 	case 5:
 	{
