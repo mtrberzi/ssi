@@ -181,10 +181,10 @@ void RV32Core::execute(uint32_t insn) {
 	case 11:
 		execute_AMO(insn); break;
 		// 12: OP
-	case 0b01100:
+	case 12:
 		execute_OP(insn); break;
 		// 13: LUI
-	case 0b01101:
+	case 13:
 	{
 		// TODO LUI
 		illegal_instruction();
@@ -238,8 +238,66 @@ void RV32Core::execute_MISC_MEM(uint32_t insn) {
 }
 
 void RV32Core::execute_OP_IMM(uint32_t insn) {
-	// TODO
-	illegal_instruction();
+	int32_t imm = (insn & 0b11111111111100000000000000000000) >> 20;
+	int rs1 = (insn & 0b00000000000011111000000000000000) >> 15;
+	uint8_t funct3 = (insn & 0b00000000000000000111000000000000) >> 12;
+	int rd = (insn & 0b00000000000000000000111110000000) >> 7;
+	uint8_t funct7 = (insn & 0b11111110000000000000000000000000) >> 25;
+	switch (funct3) {
+	case 0: // ADDI
+	{
+		set_register(rd, get_register(rs1) + imm);
+	} break;
+	case 1:
+	{
+		if (funct7 == 0) {
+			// SLLI
+			// TODO
+			illegal_instruction();
+		} else {
+			illegal_instruction();
+		}
+	} break;
+	case 2: // SLTI
+	{
+		// TODO
+		illegal_instruction();
+	} break;
+	case 3: // SLTIU
+	{
+		// TODO
+		illegal_instruction();
+	} break;
+	case 4: // XORI
+	{
+		// TODO
+		illegal_instruction();
+	} break;
+	case 5:
+	{
+		if (funct7 == 0) {
+			// SRLI
+			// TODO
+			illegal_instruction();
+		} else if (funct7 == 0b0100000) {
+			// SRAI
+			// TODO
+			illegal_instruction();
+		} else {
+			illegal_instruction();
+		}
+	} break;
+	case 6: // ORI
+	{
+		set_register(rd, get_register(rs1) | imm);
+	} break;
+	case 7: // ANDI
+	{
+		set_register(rd, get_register(rs1) & imm);
+	} break;
+	default:
+		illegal_instruction(); break;
+	}
 }
 
 void RV32Core::execute_STORE(uint32_t insn) {
@@ -297,50 +355,6 @@ private RV32Instruction decode_MISC_MEM(int insn) {
 		return new RV32_FENCE(insn);
 	case 0b001:
 		return new RV32_FENCEI(insn);
-	default:
-		return new RV32IllegalInstruction(insn);
-	}
-}
-
-private RV32Instruction decode_OP_IMM(int insn) {
-	// opcode = 0010011
-	// now decode funct3
-	int funct3 = (insn & 0b00000000000000000111000000000000) >>> 12;
-	switch (funct3) {
-	case 0b000:
-		return new RV32_ADDI(insn);
-	case 0b001:
-	{
-		// decode funct7
-		int funct7 = (insn & 0b11111110000000000000000000000000) >>> 25;
-		if (funct7 == 0b0000000) {
-			return new RV32_SLLI(insn);
-		} else {
-			return new RV32IllegalInstruction(insn);
-		}
-	}
-	case 0b010:
-		return new RV32_SLTI(insn);
-	case 0b011:
-		return new RV32_SLTIU(insn);
-	case 0b100:
-		return new RV32_XORI(insn);
-	case 0b101:
-	{
-		// decode funct7
-		int funct7 = (insn & 0b11111110000000000000000000000000) >>> 25;
-		if (funct7 == 0b0000000) {
-			return new RV32_SRLI(insn);
-		} else if (funct7 == 0b0100000) {
-			return new RV32_SRAI(insn);
-		} else {
-			return new RV32IllegalInstruction(insn);
-		}
-	}
-	case 0b110:
-		return new RV32_ORI(insn);
-	case 0b111:
-		return new RV32_ANDI(insn);
 	default:
 		return new RV32IllegalInstruction(insn);
 	}
