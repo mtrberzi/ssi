@@ -377,21 +377,82 @@ void RV32Core::execute_OP(uint32_t insn) {
     {
         switch (funct3) {
         case 0b000: // MUL
-            // TODO
+        {
+            int32_t x1 = (int32_t)get_register(rs1);
+            int32_t x2 = (int32_t)get_register(rs2);
+            set_register(rd, x1 * x2);
+        } break;
         case 0b001: // MULH
-            // TODO
+        {
+            int32_t x1 = (int32_t)get_register(rs1);
+            int32_t x2 = (int32_t)get_register(rs2);
+            int64_t product = (int64_t)x1 * (int64_t)x2;
+            set_register(rd, (uint32_t)(product >> 32));
+        } break;
         case 0b010: // MULHSU
-            // TODO
+        {
+            int32_t x1 = (int32_t)get_register(rs1);
+            int32_t x2 = (int32_t)get_register(rs2);
+            int64_t product = (int64_t)x1 * ((int64_t)x2) & 0x00000000FFFFFFFFl;
+            set_register(rd, (uint32_t)(product >> 32));
+        } break;
         case 0b011: // MULHU
-            // TODO
+        {
+            int32_t x1 = (int32_t)get_register(rs1);
+            int32_t x2 = (int32_t)get_register(rs2);
+            int64_t product = ((int64_t)rs1)&0x00000000FFFFFFFFL * ((int64_t)rs2)&0x00000000FFFFFFFFL;
+            set_register(rd, (uint32_t)(product >> 32));
+        } break;
         case 0b100: // DIV
-            // TODO
+        {
+            int32_t x1 = (int32_t)get_register(rs1);
+            int32_t x2 = (int32_t)get_register(rs2);
+            if (x2 == 0) {
+                // DIV/0
+                set_register(rd, -1);
+            } else if (x1 == -2147483648 && x2 == -1) {
+                // signed overflow
+                set_register(rd, -2147483648);
+            } else {
+                set_register(rd, x1 / x2);
+            }
+        } break;
         case 0b101: // DIVU
-            // TODO
+        {
+            uint32_t x1 = get_register(rs1);
+            uint32_t x2 = get_register(rs2);
+            if (x2 == 0) {
+                // DIV/0
+                set_register(rd, 0xFFFFFFFF);
+            } else {
+                set_register(rd, x1 / x2);
+            }
+        } break;
         case 0b110: // REM
-            // TODO
+        {
+            int32_t x1 = (int32_t)get_register(rs1);
+            int32_t x2 = (int32_t)get_register(rs2);
+            if (x2 == 0) {
+                // DIV/0
+                set_register(rd, x1);
+            } else if (x1 == -2147483648 && x2 == -1) {
+                // signed overflow
+                set_register(rd, 0);
+            } else {
+                set_register(rd, x1 % x2);
+            }
+        } break;
         case 0b111: // REMU
-            // TODO
+        {
+            uint32_t x1 = get_register(rs1);
+            uint32_t x2 = get_register(rs2);
+            if (x2 == 0) {
+                // DIV/0
+                set_register(rd, x1);
+            } else {
+                set_register(rd, x1 % x2);
+            }
+        } break;
         default:
             illegal_instruction(); break;
         }
