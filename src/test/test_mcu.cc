@@ -48,11 +48,25 @@ TEST_F (RV32CoreTest, XORI) {
 }
 
 TEST_F (RV32CoreTest, SRLI) {
-	FAIL();
+	// load x1 with 0xFF000000
+    // shift right by 8
+    // should be 0x00FF0000
+
+    set_register(1, 0xFF000000);
+    // SRLI x1, x1, 8
+    execute(0b00000000100000001101000010010011);
+    ASSERT_EQ(0x00FF0000, get_register(1));
 }
 
 TEST_F (RV32CoreTest, SRAI) {
-	FAIL();
+	// load x1 with 0xFF000000
+    // shift right by 8
+    // should be 0xFFFF0000
+
+    set_register(1, 0xFF000000);
+    // SRAI x1, x1, 8
+    execute(0b01000000100000001101000010010011);
+    ASSERT_EQ(0xFFFF0000, get_register(1));
 }
 
 TEST_F (RV32CoreTest, ORI) {
