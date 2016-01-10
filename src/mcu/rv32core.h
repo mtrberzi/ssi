@@ -55,6 +55,7 @@ protected:
 	void execute_SYSTEM(uint32_t insn);
 
 	void illegal_instruction();
+	void processor_trap(uint32_t cause);
 
 };
 

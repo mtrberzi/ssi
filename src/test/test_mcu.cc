@@ -143,6 +143,29 @@ TEST_F (RV32CoreTest, ANDI) {
 	ASSERT_EQ(0x0000000F, get_register(1));
 }
 
+TEST_F(RV32CoreTest, ADD) { FAIL(); }
+TEST_F(RV32CoreTest, SLL) { FAIL(); }
+TEST_F(RV32CoreTest, SLT) { FAIL(); }
+TEST_F(RV32CoreTest, SLTU) { FAIL(); }
+TEST_F(RV32CoreTest, XOR) { FAIL(); }
+TEST_F(RV32CoreTest, SRL) { FAIL(); }
+TEST_F(RV32CoreTest, OR) { FAIL(); }
+TEST_F(RV32CoreTest, AND) { FAIL(); }
+TEST_F(RV32CoreTest, MUL) { FAIL(); }
+TEST_F(RV32CoreTest, MULH) { FAIL(); }
+TEST_F(RV32CoreTest, MULHSU) { FAIL(); }
+TEST_F(RV32CoreTest, MULHU) { FAIL(); }
+TEST_F(RV32CoreTest, DIV) { FAIL(); }
+TEST_F(RV32CoreTest, DIVU) { FAIL(); }
+TEST_F(RV32CoreTest, REM) { FAIL(); }
+TEST_F(RV32CoreTest, REMU) { FAIL(); }
+TEST_F(RV32CoreTest, SUB) { FAIL(); }
+TEST_F(RV32CoreTest, SRA) { FAIL(); }
+TEST_F(RV32CoreTest, LUI) { FAIL(); }
+TEST_F(RV32CoreTest, AUIPC) { FAIL(); }
+TEST_F(RV32CoreTest, JAL) { FAIL(); }
+TEST_F(RV32CoreTest, JALR) { FAIL(); }
+
 int main (int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

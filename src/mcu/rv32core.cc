@@ -127,8 +127,27 @@ void RV32Core::write_csr(int csr, uint32_t value) {
 	}
 }
 
+void RV32Core::processor_trap(uint32_t cause) {
+    // when a trap is taken, the mstatus stack is pushed to the left
+    // and IE is set to 0
+    mstatus_ie1 = mstatus_ie;
+    mstatus_ie = false;
+    // save program counter
+    mepc = pc;
+    // set mcause
+    mcause = cause;
+    // counts as a context switch
+    // TODO system bus clears reservations
+    //systemBus.clearAllReservations();
+    // jump to the correct trap handler, which is always at 0x100 + whatever offset
+    if (true) {
+      // trap from machine mode
+      next_pc = 0x000001C0;
+    }
+}
+
 void RV32Core::illegal_instruction() {
-	// TODO illegal instruction handler
+	processor_trap(2);
 }
 
 bool RV32Core::interrupts_enabled() const {
@@ -136,7 +155,7 @@ bool RV32Core::interrupts_enabled() const {
 }
 
 void RV32Core::external_interrupt() {
-	// TODO external interrupt
+	processor_trap(15);
 }
 
 void RV32Core::execute(uint32_t insn) {
@@ -167,8 +186,9 @@ void RV32Core::execute(uint32_t insn) {
 		// 5: AUIPC
 	case 5:
 	{
-		// TODO AUIPC
-		illegal_instruction();
+	    uint32_t imm = (insn & 0b11111111111111111111000000000000);
+        int rd = (insn & 0b00000000000000000000111110000000) >> 7;
+        set_register(rd, pc + imm);
 	} break;
 		// 6: OP-IMM-32
 		// 7: 48b
@@ -186,8 +206,9 @@ void RV32Core::execute(uint32_t insn) {
 		// 13: LUI
 	case 13:
 	{
-		// TODO LUI
-		illegal_instruction();
+	    uint32_t imm = (insn & 0b11111111111111111111000000000000);
+	    int rd = (insn & 0b00000000000000000000111110000000) >> 7;
+	    set_register(rd, imm);
 	} break;
 		// 14: OP-32
 		// 15: 64b
@@ -205,15 +226,30 @@ void RV32Core::execute(uint32_t insn) {
 		// 25: JALR
 	case 25:
 	{
-		// TODO JALR
-		illegal_instruction();
+	    int32_t imm = ( ((int32_t)insn) & (int32_t)0b11111111111100000000000000000000) >> 20;
+        int rs1 = (insn & 0b00000000000011111000000000000000) >> 15;
+        int rd = (insn & 0b00000000000000000000111110000000) >> 7;
+
+        uint32_t target = (uint32_t) ((int32_t)get_register(rs1) + imm);
+        target &= ~(0x00000001);
+        next_pc = target;
+        set_register(rd, pc + 4);
 	} break;
 		// 26: reserved
 		// 27: JAL
 	case 27:
 	{
-		// TODO JAL
-		illegal_instruction();
+	    // immediate is broken over effectively four fields
+	    // [20] [10:1] [11] [19:12]
+	    uint32_t imm =    (insn & 0x80000000) >> (31-20) // [20]
+	                    | (insn & 0x000ff000)            // [19:12]
+	                    | (insn & 0x00100000) >> (20-11) // [11]
+	                    | (insn & 0x7fe00000) >> (21-1)  // [10:1]
+	                    ;
+	    int32_t offset = (int32_t)imm;
+	    int rd = (insn & 0b00000000000000000000111110000000) >> 7;
+	    next_pc = (uint32_t) ((int32_t)pc + offset);
+	    set_register(rd, pc + 4);
 	} break;
 		// 28: SYSTEM
 	case 28:
