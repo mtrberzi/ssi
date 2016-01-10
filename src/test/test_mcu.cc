@@ -79,7 +79,13 @@ TEST_F (RV32CoreTest, SLTI) {
 }
 
 TEST_F (RV32CoreTest, SLTIU) {
-	FAIL();
+	// load -1 into x1 and compare it to 0
+    // should place 0 into x2
+
+    set_register(1, -1);
+    // SLTIU x2, x1, 0
+    execute(0b00000000000000001011000100010011);
+    ASSERT_EQ(0, get_register(2));
 }
 
 TEST_F (RV32CoreTest, XORI) {
