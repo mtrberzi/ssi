@@ -238,7 +238,7 @@ void RV32Core::execute_MISC_MEM(uint32_t insn) {
 }
 
 void RV32Core::execute_OP_IMM(uint32_t insn) {
-	int32_t imm = (insn & 0b11111111111100000000000000000000) >> 20;
+	int32_t imm = ( ((int32_t)insn) & (int32_t)0b11111111111100000000000000000000) >> 20;
 	int rs1 = (insn & 0b00000000000011111000000000000000) >> 15;
 	uint8_t funct3 = (insn & 0b00000000000000000111000000000000) >> 12;
 	int rd = (insn & 0b00000000000000000000111110000000) >> 7;
