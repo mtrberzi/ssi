@@ -21,7 +21,7 @@ void RV32Core::step() {
  * are handled specially.
  */
 
-uint32_t RV32Core::get_register(int idx) {
+uint32_t RV32Core::get_register(int idx) const {
 	if (idx == 0) {
 		return 0;
 	} else {
@@ -243,6 +243,7 @@ void RV32Core::execute_OP_IMM(uint32_t insn) {
 	uint8_t funct3 = (insn & 0b00000000000000000111000000000000) >> 12;
 	int rd = (insn & 0b00000000000000000000111110000000) >> 7;
 	uint8_t funct7 = (insn & 0b11111110000000000000000000000000) >> 25;
+	uint8_t shamt = (insn & 0b00000001111100000000000000000000) >> 20;
 	switch (funct3) {
 	case 0: // ADDI
 	{
@@ -252,21 +253,28 @@ void RV32Core::execute_OP_IMM(uint32_t insn) {
 	{
 		if (funct7 == 0) {
 			// SLLI
-			// TODO
-			illegal_instruction();
+			set_register(rd, get_register(rs1) << shamt);
 		} else {
 			illegal_instruction();
 		}
 	} break;
 	case 2: // SLTI
 	{
-		// TODO
-		illegal_instruction();
+		int32_t val = (int32_t)get_register(rs1);
+		if (val < imm) {
+		    set_register(rd, 1);
+		} else {
+		    set_register(rd, 0);
+		}
 	} break;
 	case 3: // SLTIU
 	{
-		// TODO
-		illegal_instruction();
+		uint32_t cnst = (uint32_t)imm;
+		if (get_register(rs1) < cnst) {
+		    set_register(rd, 1);
+		} else {
+		    set_register(rd, 0);
+		}
 	} break;
 	case 4: // XORI
 	{
@@ -276,12 +284,12 @@ void RV32Core::execute_OP_IMM(uint32_t insn) {
 	{
 		if (funct7 == 0) {
 			// SRLI
-			// TODO
-			illegal_instruction();
+			set_register(rd, get_register(rs1) >> shamt);
 		} else if (funct7 == 0b0100000) {
 			// SRAI
-			// TODO
-			illegal_instruction();
+			int32_t val = (int32_t)get_register(rs1);
+			val = val >> shamt;
+			set_register(rd, (uint32_t)val);
 		} else {
 			illegal_instruction();
 		}

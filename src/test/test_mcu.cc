@@ -18,7 +18,14 @@ TEST_F (RV32CoreTest, ADDI) {
 }
 
 TEST_F (RV32CoreTest, SLLI) {
-	FAIL();
+    // load x1 with 0x000000FF
+    // shift left by 8
+    // should be 0x0000FF00
+
+    set_register(1, 0x000000FF);
+    // SLLI x1, x1, 8
+    execute(0b00000000100000001001000010010011);
+    ASSERT_EQ(0x0000FF00, get_register(1));
 }
 
 TEST_F (RV32CoreTest, SLTI) {

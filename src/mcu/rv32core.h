@@ -14,7 +14,7 @@ public:
 	void external_interrupt();
 protected:
 	uint32_t xRegister[32];
-	uint32_t get_register(int idx);
+	uint32_t get_register(int idx) const;
 	void set_register(int idx, uint32_t val);
 
 	uint32_t pc;
