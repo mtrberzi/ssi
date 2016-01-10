@@ -269,8 +269,17 @@ void RV32Core::execute_LOAD(uint32_t insn) {
 }
 
 void RV32Core::execute_MISC_MEM(uint32_t insn) {
-	// TODO
-	illegal_instruction();
+    uint8_t funct3 = (insn & 0b00000000000000000111000000000000) >> 12;
+    switch (funct3) {
+    case 0b000: // FENCE
+        // should be a no-op here.
+        break;
+    case 0b001: // FENCEI
+        // TODO clear instruction cache, if we have one
+        break;
+    default:
+        illegal_instruction(); break;
+    }
 }
 
 void RV32Core::execute_OP_IMM(uint32_t insn) {
@@ -574,20 +583,6 @@ private RV32Instruction decode_LOAD(int insn) {
 		return new RV32_LBU(insn);
 	case 0b101:
 		return new RV32_LHU(insn);
-	default:
-		return new RV32IllegalInstruction(insn);
-	}
-}
-
-private RV32Instruction decode_MISC_MEM(int insn) {
-	// opcode = 0001111
-	// now decode funct3
-	int funct3 = (insn & 0b00000000000000000111000000000000) >>> 12;
-	switch (funct3) {
-	case 0b000:
-		return new RV32_FENCE(insn);
-	case 0b001:
-		return new RV32_FENCEI(insn);
 	default:
 		return new RV32IllegalInstruction(insn);
 	}
