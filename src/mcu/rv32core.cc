@@ -318,8 +318,104 @@ void RV32Core::execute_AMO(uint32_t insn) {
 }
 
 void RV32Core::execute_OP(uint32_t insn) {
-	// TODO
-	illegal_instruction();
+    // first decode funct7 as MUL/DIV have a different prefix
+    uint8_t funct7 = (insn & 0b11111110000000000000000000000000) >> 25;
+    uint8_t funct3 = (insn & 0b00000000000000000111000000000000) >> 12;
+    int rs2 = (insn & 0b00000001111100000000000000000000) >> 20;
+    int rs1 = (insn & 0b00000000000011111000000000000000) >> 15;
+    int rd = (insn & 0b00000000000000000000111110000000) >> 7;
+
+    switch (funct7) {
+    case 0b0000000:
+        // standard integer ops
+    {
+        switch (funct3) {
+        case 0b000: // ADD
+            set_register(rd, get_register(rs1) + get_register(rs2));
+            break;
+        case 0b001: // SLL
+            set_register(rd, get_register(rs1) << (get_register(rs2) & 0x0000001F));
+            break;
+        case 0b010: // SLT
+        {
+            int32_t x1 = (int32_t)get_register(rs1);
+            int32_t x2 = (int32_t)get_register(rs2);
+            if (x1 < x2) {
+                set_register(rd, 1);
+            } else {
+                set_register(rd, 0);
+            }
+        } break;
+        case 0b011: // SLTU
+        {
+            uint32_t x1 = get_register(rs1);
+            uint32_t x2 = get_register(rs2);
+            if (x1 < x2) {
+                set_register(rd, 1);
+            } else {
+                set_register(rd, 0);
+            }
+        } break;
+        case 0b100: // XOR
+            set_register(rd, get_register(rs1) ^ get_register(rs2));
+            break;
+        case 0b101: // SRL
+            set_register(rd, get_register(rs1) >> (get_register(rs2) & 0x0000001F));
+            break;
+        case 0b110: // OR
+            set_register(rd, get_register(rs1) | get_register(rs2));
+            break;
+        case 0b111: // AND
+            set_register(rd, get_register(rs1) & get_register(rs2));
+            break;
+        default:
+            illegal_instruction(); break;
+        }
+    } break;
+    case 0b0000001:
+        // MUL/DIV
+    {
+        switch (funct3) {
+        case 0b000: // MUL
+            // TODO
+        case 0b001: // MULH
+            // TODO
+        case 0b010: // MULHSU
+            // TODO
+        case 0b011: // MULHU
+            // TODO
+        case 0b100: // DIV
+            // TODO
+        case 0b101: // DIVU
+            // TODO
+        case 0b110: // REM
+            // TODO
+        case 0b111: // REMU
+            // TODO
+        default:
+            illegal_instruction(); break;
+        }
+    } break;
+    case 0b0100000:
+        // other standard integer ops
+    {
+        switch (funct3) {
+        case 0b000: // SUB
+            set_register(rd, get_register(rs1) - get_register(rs2));
+            break;
+        case 0b101: // SRA
+        {
+            int32_t val = (int32_t)get_register(rs1);
+            val = val >> (int32_t)(get_register(rs2) & 0x0000001F);
+            set_register(rd, (uint32_t)val);
+        } break;
+        default:
+            illegal_instruction(); break;
+        }
+    } break;
+    default:
+        illegal_instruction(); break;
+    }
 }
 
 void RV32Core::execute_BRANCH(uint32_t insn) {
@@ -407,77 +503,6 @@ private RV32Instruction decode_AMO(int insn) {
 			return new RV32IllegalInstruction(insn);
 		}
 	} else {
-		return new RV32IllegalInstruction(insn);
-	}
-}
-
-private RV32Instruction decode_OP(int insn) {
-	// opcode = 0110011
-	// first decode funct7 as MUL/DIV have a different prefix
-	int funct7 = (insn & 0b11111110000000000000000000000000) >>> 25;
-	int funct3 = (insn & 0b00000000000000000111000000000000) >>> 12;
-	switch (funct7) {
-	case 0b0000000:
-		// standard integer ops
-	{
-		switch (funct3) {
-		case 0b000:
-			return new RV32_ADD(insn);
-		case 0b001:
-			return new RV32_SLL(insn);
-		case 0b010:
-			return new RV32_SLT(insn);
-		case 0b011:
-			return new RV32_SLTU(insn);
-		case 0b100:
-			return new RV32_XOR(insn);
-		case 0b101:
-			return new RV32_SRL(insn);
-		case 0b110:
-			return new RV32_OR(insn);
-		case 0b111:
-			return new RV32_AND(insn);
-		default:
-			return new RV32IllegalInstruction(insn);
-		}
-	}
-	case 0b0000001:
-		// MUL/DIV
-	{
-		switch (funct3) {
-		case 0b000:
-			return new RV32_MUL(insn);
-		case 0b001:
-			return new RV32_MULH(insn);
-		case 0b010:
-			return new RV32_MULHSU(insn);
-		case 0b011:
-			return new RV32_MULHU(insn);
-		case 0b100:
-			return new RV32_DIV(insn);
-		case 0b101:
-			return new RV32_DIVU(insn);
-		case 0b110:
-			return new RV32_REM(insn);
-		case 0b111:
-			return new RV32_REMU(insn);
-		default:
-			return new RV32IllegalInstruction(insn);
-		}
-	}
-	case 0b0100000:
-		// other standard integer ops
-	{
-		switch (funct3) {
-		case 0b000:
-			return new RV32_SUB(insn);
-		case 0b101:
-			return new RV32_SRA(insn);
-		default:
-			return new RV32IllegalInstruction(insn);
-		}
-	}
-	default:
 		return new RV32IllegalInstruction(insn);
 	}
 }
