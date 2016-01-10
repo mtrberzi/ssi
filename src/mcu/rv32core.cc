@@ -516,8 +516,41 @@ void RV32Core::execute_OP(uint32_t insn) {
 }
 
 void RV32Core::execute_BRANCH(uint32_t insn) {
-	// TODO
-	illegal_instruction();
+    uint8_t funct3 = (insn & 0b00000000000000000111000000000000) >> 12;
+    int32_t imm = (insn & 0b10000000000000000000000000000000) >> (31-12)
+        | (insn & 0b01111110000000000000000000000000) >> (25-5)
+        | (insn & 0b00000000000000000000111100000000) >> (8-1)
+        | (insn & 0b00000000000000000000000010000000) << (11-7);
+    int rs2 = (insn & 0b00000001111100000000000000000000) >> 20;
+    int rs1 = (insn & 0b00000000000011111000000000000000) >> 15;
+
+    uint32_t x1_u = get_register(rs1);
+    uint32_t x2_u = get_register(rs2);
+    int32_t x1_s = (int32_t)get_register(rs1);
+    int32_t x2_s = (int32_t)get_register(rs2);
+
+    bool branch_taken;
+
+    switch (funct3) {
+    case 0b000: // BEQ
+        branch_taken = (x1_u == x2_u); break;
+    case 0b001: // BNE
+        branch_taken = (x1_u != x2_u); break;
+    case 0b100: // BLT
+        branch_taken = (x1_s < x2_s); break;
+    case 0b101: // BGE
+        branch_taken = (x1_s >= x2_s); break;
+    case 0b110: // BLTU
+        branch_taken = (x1_u < x2_u); break;
+    case 0b111: // BGEU
+        branch_taken = (x1_u >= x2_u); break;
+    default:
+        illegal_instruction(); return;
+    }
+
+    if (branch_taken) {
+        next_pc = (uint32_t) ( (int32_t)pc + imm );
+    }
 }
 
 void RV32Core::execute_SYSTEM(uint32_t insn) {
@@ -600,28 +633,6 @@ private RV32Instruction decode_AMO(int insn) {
 			return new RV32IllegalInstruction(insn);
 		}
 	} else {
-		return new RV32IllegalInstruction(insn);
-	}
-}
-
-private RV32Instruction decode_BRANCH(int insn) {
-	// opcode = 1100011
-	// now decode funct3
-	int funct3 = (insn & 0b00000000000000000111000000000000) >>> 12;
-	switch (funct3) {
-	case 0b000:
-		return new RV32_BEQ(insn);
-	case 0b001:
-		return new RV32_BNE(insn);
-	case 0b100:
-		return new RV32_BLT(insn);
-	case 0b101:
-		return new RV32_BGE(insn);
-	case 0b110:
-		return new RV32_BLTU(insn);
-	case 0b111:
-		return new RV32_BGEU(insn);
-	default:
 		return new RV32IllegalInstruction(insn);
 	}
 }
