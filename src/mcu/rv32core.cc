@@ -2,7 +2,8 @@
 
 RV32Core::RV32Core()
 : pc(0), next_pc(0), mstatus_ie(false), mstatus_ie1(false),
-  mscratch(0), mepc(0), mcause(0), mbadaddr(0), instret(0)
+  mscratch(0), mepc(0), mcause(0), mbadaddr(0), instret(0),
+  system_bus(new SystemBus())
 {
 	for (int i = 0; i < 32; ++i) {
 		xRegister[i] = 0;
@@ -10,7 +11,9 @@ RV32Core::RV32Core()
 }
 
 RV32Core::~RV32Core() {
-
+    if (system_bus != NULL) {
+        delete system_bus;
+    }
 }
 
 void RV32Core::step() {
@@ -137,8 +140,7 @@ void RV32Core::processor_trap(uint32_t cause) {
     // set mcause
     mcause = cause;
     // counts as a context switch
-    // TODO system bus clears reservations
-    //systemBus.clearAllReservations();
+    system_bus->clear_all_reservations();
     // jump to the correct trap handler, which is always at 0x100 + whatever offset
     if (true) {
       // trap from machine mode
@@ -148,10 +150,6 @@ void RV32Core::processor_trap(uint32_t cause) {
 
 void RV32Core::illegal_instruction() {
 	processor_trap(2);
-}
-
-bool RV32Core::interrupts_enabled() const {
-	return mstatus_ie;
 }
 
 void RV32Core::external_interrupt() {
@@ -275,7 +273,7 @@ void RV32Core::execute_MISC_MEM(uint32_t insn) {
         // should be a no-op here.
         break;
     case 0b001: // FENCEI
-        // TODO clear instruction cache, if we have one
+        // clear instruction cache, if we have one
         break;
     default:
         illegal_instruction(); break;
@@ -585,7 +583,7 @@ void RV32Core::execute_SYSTEM(uint32_t insn) {
             mstatus_ie1 = true;
             next_pc = mepc;
             // counts as a context switch
-            // TODO system bus clears all reservations
+            system_bus->clear_all_reservations();
             break;
         default:
             illegal_instruction(); break;

@@ -2,6 +2,7 @@
 #define _MCU_RV32CORE_
 
 #include <cstdint>
+#include "system_bus.h"
 
 class RV32Core {
 public:
@@ -10,8 +11,10 @@ public:
 
 	void step();
 	void execute(uint32_t insn);
-	bool interrupts_enabled() const;
+	bool interrupts_enabled() const { return mstatus_ie; }
 	void external_interrupt();
+
+	SystemBus * get_system_bus() const { return system_bus; }
 protected:
 	uint32_t xRegister[32];
 	uint32_t get_register(int idx) const;
@@ -20,7 +23,7 @@ protected:
 	uint32_t pc;
 	uint32_t next_pc;
 
-	// TODO system bus
+	SystemBus * system_bus;
 
 	// use a split mstatus register; we only need two fields
 	bool mstatus_ie;
