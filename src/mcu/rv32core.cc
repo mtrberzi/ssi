@@ -546,7 +546,7 @@ void RV32Core::execute_AMO(uint32_t insn) {
 			illegal_instruction(); break;
 		}
 	} else {
-		illegal_instruction(); break;
+		illegal_instruction(); return;
 	}
 }
 
