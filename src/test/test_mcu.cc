@@ -1,7 +1,71 @@
 #include "gtest/gtest.h"
 #include "rv32core.h"
+#include "rom.h"
+#include "ram.h"
+#include <cstdint>
+#include <vector>
+
+static const uint32_t textMemoryBase = 0x00000000;
+static const uint32_t textMemoryPages = 4;
+static const uint32_t dataMemoryBase = 0x10000000;
+static const uint32_t dataMemoryPages = 4;
 
 class RV32CoreTest: public RV32Core, public ::testing::Test {
+};
+
+class RV32CodeExecution : public RV32Core, public ::testing::Test {
+public:
+	ROM * text_memory;
+	RAM * data_memory;
+
+	void SetUp() {
+		text_memory = new ROM(textMemoryPages);
+		system_bus->attach_peripheral(text_memory, textMemoryBase);
+		data_memory = new RAM(dataMemoryPages);
+		system_bus->attach_peripheral(data_memory, dataMemoryBase);
+		// stack pointer initially goes to top of RAM, 16-byte aligned
+		uint32_t dataMemoryTop = dataMemoryBase + (dataMemoryPages * 1024) - 1;
+		set_register(2, dataMemoryTop & 0xFFFFFFF0);
+	}
+
+	void TearDown() {
+		delete text_memory;
+		delete data_memory;
+	}
+
+	void load_program(uint32_t *text, uint32_t nTextWords) {
+		if (nTextWords > textMemoryPages * (1024/4)) {
+			FAIL() << "insufficient memory to load program";
+		}
+		uint8_t * bText = new uint8_t[nTextWords * 4];
+		for (uint32_t tPtr = 0; tPtr < nTextWords; ++tPtr) {
+			uint32_t insn = text[tPtr];
+			uint32_t bPtr = 4 * tPtr;
+			bText[bPtr+0] = (uint8_t)((insn & 0x000000FF));
+			bText[bPtr+1] = (uint8_t)((insn & 0x0000FF00) >>  8);
+			bText[bPtr+2] = (uint8_t)((insn & 0x00FF0000) >> 16);
+			bText[bPtr+3] = (uint8_t)((insn & 0xFF000000) >> 24);
+		}
+		text_memory->set_contents(bText);
+		delete[] bText;
+	}
+
+	void load_program(std::vector<uint32_t> program) {
+		load_program(program.data(), program.size());
+	}
+
+	void run(uint32_t maxCycles) {
+		// prime ra (x1) with a target return address
+		uint32_t retTarget = 0xDDCCDDCC;
+		set_register(1, retTarget);
+		for (uint32_t i = 0; i < maxCycles; ++i) {
+			step();
+			if (pc == retTarget) {
+				return;
+			}
+		}
+		FAIL() << "CPU did not terminate after " << maxCycles << " steps";
+	}
 };
 
 TEST_F (RV32CoreTest, X0_ConstantZero) {
@@ -199,6 +263,12 @@ TEST_F(RV32CoreTest, AMOMINW) { FAIL(); }
 TEST_F(RV32CoreTest, AMOMAXW) { FAIL(); }
 TEST_F(RV32CoreTest, AMOMINUW) { FAIL(); }
 TEST_F(RV32CoreTest, AMOMAXUW) { FAIL(); }
+
+TEST_F(RV32CodeExecution, ReturnOnly) {
+	std::vector<uint32_t> program {0x00008067};
+	load_program(program);
+	run(1);
+}
 
 int main (int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);

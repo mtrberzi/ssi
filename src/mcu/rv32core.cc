@@ -17,7 +17,11 @@ RV32Core::~RV32Core() {
 }
 
 void RV32Core::step() {
-	// TODO step
+	uint32_t insn = system_bus->load_word(pc);
+	next_pc = pc + 4;
+	execute(insn);
+	instret += 1L;
+	pc = next_pc;
 }
 
 /* Register 0 is fixed to the value zero, so reads and writes
