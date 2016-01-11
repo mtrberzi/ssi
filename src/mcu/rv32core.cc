@@ -262,8 +262,57 @@ void RV32Core::execute(uint32_t insn) {
 }
 
 void RV32Core::execute_LOAD(uint32_t insn) {
-	// TODO
-	illegal_instruction();
+	uint8_t funct3 = (insn & 0b00000000000000000111000000000000) >> 12;
+    int32_t imm = ( ((int32_t)insn) & (int32_t)0b11111111111100000000000000000000) >> 20;
+	int rs1 = (insn & 0b00000000000011111000000000000000) >> 15;
+	int rd = (insn & 0b00000000000000000000111110000000) >> 7;
+
+	uint32_t addr = (uint32_t)((int32_t)get_register(rs1) + imm);
+	uint32_t val = 0;
+	bool cancel_load = false; // will be set to true if a bus error occurs
+
+	// TODO check legal address on system bus
+
+	switch (funct3) {
+	case 0b000: // LB
+	{
+		uint8_t di = system_bus->load_byte(addr);
+		// sign-extend to 32 bits
+		val = (uint32_t)di;
+		if (di & 0x80) {
+			val += 0xFFFFFF00;
+		}
+	} break;
+	case 0b001: // LH
+	{
+		uint16_t di = system_bus->load_halfword(addr);
+		// sign-extend to 32 bits
+		val = (uint32_t)di;
+		if (di & 0x8000) {
+			val += 0xFFFF0000;
+		}
+	} break;
+	case 0b010: // LW
+	{
+		val = system_bus->load_word(addr);
+	} break;
+	case 0b100: // LBU
+	{
+		// do not sign-extend
+		val = (uint32_t)system_bus->load_byte(addr);
+	} break;
+	case 0b101: // LHU
+	{
+		// do not sign-extend
+		val = (uint32_t)system_bus->load_halfword(addr);
+	} break;
+	default:
+		illegal_instruction(); cancel_load = true; break;
+	}
+
+	if (!cancel_load) {
+		set_register(rd, val);
+	}
 }
 
 void RV32Core::execute_MISC_MEM(uint32_t insn) {
@@ -351,8 +400,40 @@ void RV32Core::execute_OP_IMM(uint32_t insn) {
 }
 
 void RV32Core::execute_STORE(uint32_t insn) {
-	// TODO
-	illegal_instruction();
+	int funct3 = (insn & 0b00000000000000000111000000000000) >> 12;
+    uint32_t imm = (insn & 0b11111110000000000000000000000000) >> (25-5)
+        | (insn & 0b00000000000000000000111110000000) >> 7;
+    // sign-extend to 32 bits
+    if (imm & 0x00000800) {
+    	imm += 0xFFFFF000;
+    }
+    int32_t offset = (int32_t)imm;
+    int rs2 = (insn & 0b00000001111100000000000000000000) >> 20;
+    int rs1 = (insn & 0b00000000000011111000000000000000) >> 15;
+
+    uint32_t addr = (uint32_t)((int32_t)get_register(rs1) + offset);
+
+    // TODO system bus checks valid address
+
+	switch (funct3) {
+	case 0b000: // SB
+	{
+		uint8_t dout = (uint8_t) (get_register(rs2) & 0x000000FF);
+		system_bus->store_byte(addr, dout);
+	} break;
+	case 0b001: // SH
+	{
+		uint16_t dout = (uint16_t) (get_register(rs2) & 0x0000FFFF);
+		system_bus->store_halfword(addr, dout);
+	} break;
+	case 0b010: // SW
+	{
+		uint32_t dout = get_register(rs2);
+		system_bus->store_word(addr, dout);
+	} break;
+	default:
+		illegal_instruction(); break;
+	}
 }
 
 void RV32Core::execute_AMO(uint32_t insn) {
@@ -645,42 +726,6 @@ void RV32Core::execute_SYSTEM(uint32_t insn) {
 }
 
 /*
-private RV32Instruction decode_LOAD(int insn) {
-	// opcode = 0000011
-	// now decode funct3
-	int funct3 = (insn & 0b00000000000000000111000000000000) >>> 12;
-	switch (funct3) {
-	case 0b000:
-		return new RV32_LB(insn);
-	case 0b001:
-		return new RV32_LH(insn);
-	case 0b010:
-		return new RV32_LW(insn);
-	case 0b100:
-		return new RV32_LBU(insn);
-	case 0b101:
-		return new RV32_LHU(insn);
-	default:
-		return new RV32IllegalInstruction(insn);
-	}
-}
-
-private RV32Instruction decode_STORE(int insn) {
-	// opcode = 0100011
-	// now decode funct3
-	int funct3 = (insn & 0b00000000000000000111000000000000) >>> 12;
-	switch (funct3) {
-	case 0b000:
-		return new RV32_SB(insn);
-	case 0b001:
-		return new RV32_SH(insn);
-	case 0b010:
-		return new RV32_SW(insn);
-	default:
-		return new RV32IllegalInstruction(insn);
-	}
-}
-
 private RV32Instruction decode_AMO(int insn) {
 	// opcode = 0101111
 	int funct7 = (insn & 0b11111110000000000000000000000000) >>> 25;

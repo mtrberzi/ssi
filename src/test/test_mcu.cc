@@ -180,6 +180,14 @@ TEST_F(RV32CoreTest, CSRRC) { FAIL(); }
 TEST_F(RV32CoreTest, CSRRWI) { FAIL(); }
 TEST_F(RV32CoreTest, CSRRSI) { FAIL(); }
 TEST_F(RV32CoreTest, CSRRCI) { FAIL(); }
+TEST_F(RV32CoreTest, LB) { FAIL(); }
+TEST_F(RV32CoreTest, LH) { FAIL(); }
+TEST_F(RV32CoreTest, LW) { FAIL(); }
+TEST_F(RV32CoreTest, LBU) { FAIL(); }
+TEST_F(RV32CoreTest, LHU) { FAIL(); }
+TEST_F(RV32CoreTest, SB) { FAIL(); }
+TEST_F(RV32CoreTest, SH) { FAIL(); }
+TEST_F(RV32CoreTest, SW) { FAIL(); }
 
 int main (int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
