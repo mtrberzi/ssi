@@ -188,6 +188,17 @@ TEST_F(RV32CoreTest, LHU) { FAIL(); }
 TEST_F(RV32CoreTest, SB) { FAIL(); }
 TEST_F(RV32CoreTest, SH) { FAIL(); }
 TEST_F(RV32CoreTest, SW) { FAIL(); }
+TEST_F(RV32CoreTest, LRW) { FAIL(); }
+TEST_F(RV32CoreTest, SCW) { FAIL(); }
+TEST_F(RV32CoreTest, AMOSWAPW) { FAIL(); }
+TEST_F(RV32CoreTest, AMOADDW) { FAIL(); }
+TEST_F(RV32CoreTest, AMOXORW) { FAIL(); }
+TEST_F(RV32CoreTest, AMOANDW) { FAIL(); }
+TEST_F(RV32CoreTest, AMOORW) { FAIL(); }
+TEST_F(RV32CoreTest, AMOMINW) { FAIL(); }
+TEST_F(RV32CoreTest, AMOMAXW) { FAIL(); }
+TEST_F(RV32CoreTest, AMOMINUW) { FAIL(); }
+TEST_F(RV32CoreTest, AMOMAXUW) { FAIL(); }
 
 int main (int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);

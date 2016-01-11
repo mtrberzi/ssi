@@ -437,8 +437,117 @@ void RV32Core::execute_STORE(uint32_t insn) {
 }
 
 void RV32Core::execute_AMO(uint32_t insn) {
-	// TODO
-	illegal_instruction();
+	uint8_t funct7 = (insn & 0b11111110000000000000000000000000) >> 25;
+	uint8_t funct3 = (insn & 0b00000000000000000111000000000000) >> 12;
+	int rs2 = (insn & 0b00000001111100000000000000000000) >> 20;
+	int rs1 = (insn & 0b00000000000011111000000000000000) >> 15;
+	int rd = (insn & 0b00000000000000000000111110000000) >> 7;
+	// check funct3 = 010
+	if (funct3 == 0b010) {
+		// early validate address
+		uint32_t addr = get_register(rs1);
+		// TODO system bus validate address
+		uint32_t data_out = get_register(rs2);
+		// decode the 5 highest bits of funct7
+		uint8_t amofunct = funct7 >> 2;
+		switch (amofunct) {
+		case 0b00010: // LRW
+		{
+			uint32_t data_in = system_bus->load_word(addr);
+			set_register(rd, data_in);
+			system_bus->set_reservation(addr);
+		} break;
+		case 0b00011: // SCW
+		{
+			if (system_bus->is_reserved(addr)) {
+				system_bus->store_word(addr, data_out);
+				system_bus->clear_reservation(addr);
+			} else {
+				set_register(rd, 1);
+			}
+		} break;
+		case 0b00001: // AMOSWAPW
+		{
+			uint32_t data_in = system_bus->load_word(addr);
+			set_register(rd, data_in);
+			system_bus->store_word(addr, data_out);
+		} break;
+		case 0b00000: // AMOADDW
+		{
+			uint32_t data_in = system_bus->load_word(addr);
+			set_register(rd, data_in);
+			system_bus->store_word(addr, data_in + data_out);
+		} break;
+		case 0b00100: // AMOXORW
+		{
+			uint32_t data_in = system_bus->load_word(addr);
+			set_register(rd, data_in);
+			system_bus->store_word(addr, data_in ^ data_out);
+		} break;
+		case 0b01100: // AMOANDW
+		{
+			uint32_t data_in = system_bus->load_word(addr);
+			set_register(rd, data_in);
+			system_bus->store_word(addr, data_in & data_out);
+		} break;
+		case 0b01000: // AMOORW
+		{
+			uint32_t data_in = system_bus->load_word(addr);
+			set_register(rd, data_in);
+			system_bus->store_word(addr, data_in | data_out);
+		} break;
+		case 0b10000: // AMOMINW
+		{
+			uint32_t data_in = system_bus->load_word(addr);
+			set_register(rd, data_in);
+
+			int32_t data_in_s = (int32_t)data_in;
+			int32_t data_out_s = (int32_t)data_out;
+			if (data_in_s < data_out_s) {
+				system_bus->store_word(addr, data_in);
+			} else {
+				system_bus->store_word(addr, data_out);
+			}
+		} break;
+		case 0b10100: // AMOMAXW
+		{
+			uint32_t data_in = system_bus->load_word(addr);
+			set_register(rd, data_in);
+
+			int32_t data_in_s = (int32_t)data_in;
+			int32_t data_out_s = (int32_t)data_out;
+			if (data_in_s > data_out_s) {
+				system_bus->store_word(addr, data_in);
+			} else {
+				system_bus->store_word(addr, data_out);
+			}
+		} break;
+		case 0b11000: // AMOMINUW
+		{
+			uint32_t data_in = system_bus->load_word(addr);
+			set_register(rd, data_in);
+			if (data_in < data_out) {
+				system_bus->store_word(addr, data_in);
+			} else {
+				system_bus->store_word(addr, data_out);
+			}
+		} break;
+		case 0b11100: // AMOMAXUW
+		{
+			uint32_t data_in = system_bus->load_word(addr);
+			set_register(rd, data_in);
+			if (data_in > data_out) {
+				system_bus->store_word(addr, data_in);
+			} else {
+				system_bus->store_word(addr, data_out);
+			}
+		} break;
+		default:
+			illegal_instruction(); break;
+		}
+	} else {
+		illegal_instruction(); break;
+	}
 }
 
 void RV32Core::execute_OP(uint32_t insn) {
@@ -724,33 +833,3 @@ void RV32Core::execute_SYSTEM(uint32_t insn) {
         illegal_instruction(); break;
     }
 }
-
-/*
-private RV32Instruction decode_AMO(int insn) {
-	// opcode = 0101111
-	int funct7 = (insn & 0b11111110000000000000000000000000) >>> 25;
-	int funct3 = (insn & 0b00000000000000000111000000000000) >>> 12;
-	// check funct3 = 010
-	if (funct3 == 0b010) {
-		// decode the 5 highest bits of funct7
-		int amofunct = funct7 >>> 2;
-		switch (amofunct) {
-		case 0b00010: return new RV32_LRW(insn);
-		case 0b00011: return new RV32_SCW(insn);
-		case 0b00001: return new RV32_AMOSWAPW(insn);
-		case 0b00000: return new RV32_AMOADDW(insn);
-		case 0b00100: return new RV32_AMOXORW(insn);
-		case 0b01100: return new RV32_AMOANDW(insn);
-		case 0b01000: return new RV32_AMOORW(insn);
-		case 0b10000: return new RV32_AMOMINW(insn);
-		case 0b10100: return new RV32_AMOMAXW(insn);
-		case 0b11000: return new RV32_AMOMINUW(insn);
-		case 0b11100: return new RV32_AMOMAXUW(insn);
-		default:
-			return new RV32IllegalInstruction(insn);
-		}
-	} else {
-		return new RV32IllegalInstruction(insn);
-	}
-}
-*/
