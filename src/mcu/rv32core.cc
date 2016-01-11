@@ -563,8 +563,87 @@ void RV32Core::execute_BRANCH(uint32_t insn) {
 }
 
 void RV32Core::execute_SYSTEM(uint32_t insn) {
-	// TODO
-	illegal_instruction();
+    uint8_t funct3 = (insn & 0b00000000000000000111000000000000) >> 12;
+    int32_t imm = ( ((int32_t)insn) & (int32_t)0b11111111111100000000000000000000) >> 20;
+    int rs1 = (insn & 0b00000000000011111000000000000000) >> 15;
+    int rd = (insn & 0b00000000000000000000111110000000) >> 7;
+
+    switch (funct3) {
+    case 0b000:
+    {
+        // decode imm (funct12)
+        int imm = (insn & 0b11111111111100000000000000000000) >> 20;
+        switch (imm) {
+        case 0b000000000000: // SCALL
+            processor_trap(11); break;
+        case 0b000000000001: // SBREAK
+            processor_trap(3); break;
+        case 0b000100000000: // ERET
+            // pop the interrupt stack to the right and set
+            // the leftmost entry to interrupts enabled
+            mstatus_ie = mstatus_ie1;
+            mstatus_ie1 = true;
+            next_pc = mepc;
+            // counts as a context switch
+            // TODO system bus clears all reservations
+            break;
+        default:
+            illegal_instruction(); break;
+        }
+    } break;
+    case 0b001: // CSRRW
+    {
+        int csr = imm;
+        uint32_t old_value = read_csr(csr);
+        write_csr(csr, get_register(rs1));
+        set_register(rd, old_value);
+    } break;
+    case 0b010: // CSRRS
+    {
+        int csr = imm;
+        uint32_t old_value = read_csr(csr);
+        if (rs1 != 0) {
+            write_csr(csr, old_value | get_register(rs1));
+        }
+        set_register(rd, old_value);
+    } break;
+    case 0b011: // CSRRC
+    {
+        int csr = imm;
+        uint32_t old_value = read_csr(csr);
+        if (rs1 != 0) {
+            write_csr(csr, old_value & ~get_register(rs1));
+        }
+        set_register(rd, old_value);
+    } break;
+    case 0b101: // CSRRWI
+    {
+        int csr = imm;
+        uint32_t old_value = read_csr(csr);
+        write_csr(csr, rs1);
+        set_register(rd, old_value);
+    } break;
+    case 0b110: // CSRRSI
+    {
+        int csr = imm;
+        uint32_t old_value = read_csr(csr);
+        if (rs1 != 0) {
+            write_csr(csr, old_value | rs1);
+        }
+        set_register(rd, old_value);
+    } break;
+    case 0b111: // CSRRCI
+    {
+        int csr = imm;
+        uint32_t old_value = read_csr(csr);
+        if (rs1 != 0) {
+            write_csr(csr, old_value & ~rs1);
+        }
+        set_register(rd, old_value);
+    } break;
+    default:
+        illegal_instruction(); break;
+    }
 }
 
 /*
@@ -628,43 +707,6 @@ private RV32Instruction decode_AMO(int insn) {
 			return new RV32IllegalInstruction(insn);
 		}
 	} else {
-		return new RV32IllegalInstruction(insn);
-	}
-}
-
-private RV32Instruction decode_SYSTEM(int insn) {
-	// opcode = 1110011
-	// now decode funct3
-	int funct3 = (insn & 0b00000000000000000111000000000000) >>> 12;
-	switch (funct3) {
-	case 0b000:
-	{
-		// decode imm (funct12)
-		int imm = (insn & 0b11111111111100000000000000000000) >>> 20;
-		switch (imm) {
-		case 0b000000000000:
-			return new RV32_SCALL(insn);
-		case 0b000000000001:
-			return new RV32_SBREAK(insn);
-		case 0b000100000000:
-			return new RV32_ERET(insn);
-		default:
-			return new RV32IllegalInstruction(insn);
-		}
-	}
-	case 0b001:
-		return new RV32_CSRRW(insn);
-	case 0b010:
-		return new RV32_CSRRS(insn);
-	case 0b011:
-		return new RV32_CSRRC(insn);
-	case 0b101:
-		return new RV32_CSRRWI(insn);
-	case 0b110:
-		return new RV32_CSRRSI(insn);
-	case 0b111:
-		return new RV32_CSRRCI(insn);
-	default:
 		return new RV32IllegalInstruction(insn);
 	}
 }
