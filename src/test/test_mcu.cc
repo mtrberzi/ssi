@@ -270,6 +270,49 @@ TEST_F(RV32CodeExecution, ReturnOnly) {
 	run(1);
 }
 
+TEST_F(RV32CodeExecution, Fibonacci15) {
+	// call with n in a0, returns fib(n) in a0
+	std::vector<uint32_t> program {
+		0xfe010113,
+		0x00112e23,
+		0x00812c23,
+		0x00912a23,
+		0x02010413,
+		0xfea42623,
+		0xfec42703,
+		0x00100793,
+		0x00e7c663,
+		0xfec42783,
+		0x0300006f,
+		0xfec42783,
+		0xfff78793,
+		0x00078513,
+		0xfc9ff0ef,
+		0x00050493,
+		0xfec42783,
+		0xffe78793,
+		0x00078513,
+		0xfb5ff0ef,
+		0x00050793,
+		0x00f487b3,
+		0x00078513,
+		0x01c12083,
+		0x01812403,
+		0x01412483,
+		0x02010113,
+		0x00008067,
+	};
+
+	uint32_t fib[] = {0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610};
+
+	uint32_t n = 15;
+	uint32_t expected_result = fib[n];
+	set_register(10, n);
+	run(42415); // exact for fib(15)
+	uint32_t actual_result = get_register(10);
+	ASSERT_EQ(expected_result, actual_result);
+}
+
 int main (int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
