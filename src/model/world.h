@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <cstdint>
 #include <vector>
+#include <cmath>
 #include "vector.h"
 #include "voxel_occupant.h"
 #include "transport_tube.h"
@@ -51,9 +52,9 @@ protected:
 		if (ds < 0.0) {
 			return intbound(-s, -ds);
 		} else {
-			s = s % 1;
+			s = fmod(s, 1.0);
 			// now we have s + t*ds = 1
-			return (1 - s) / ds;
+			return (1.0 - s) / ds;
 		}
 	}
 
