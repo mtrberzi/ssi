@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <map>
 #include <unordered_set>
+#include <cstring>
 
 static uint32_t LAST_VALID_PAGE = 0xFFFFFFFF >> 10;
 
@@ -15,11 +16,9 @@ public:
 
     uint32_t translate_address(uint32_t pAddr) {
         uint32_t v = get_number_of_pages() * 1024;
-        // TODO use a better algorithm -- this is very slow
-        uint32_t mask = 1;
-        while (mask < v) {
-            mask = mask << 1;
-        }
+        int firstSetPos = ffs(v);
+        // 1 <= firstSetPos <= 32
+        uint32_t mask = (uint32_t) (1 << firstSetPos);
         mask -= 1;
         return pAddr & mask;
     }
