@@ -37,17 +37,17 @@ public:
 		if (nTextWords > textMemoryPages * (1024/4)) {
 			FAIL() << "insufficient memory to load program";
 		}
-		uint8_t * bText = new uint8_t[nTextWords * 4];
+		uint8_t *byteText = (uint8_t*)malloc(sizeof(uint8_t) * nTextWords * 4);
 		for (uint32_t tPtr = 0; tPtr < nTextWords; ++tPtr) {
 			uint32_t insn = text[tPtr];
 			uint32_t bPtr = 4 * tPtr;
-			bText[bPtr+0] = (uint8_t)((insn & 0x000000FF));
-			bText[bPtr+1] = (uint8_t)((insn & 0x0000FF00) >>  8);
-			bText[bPtr+2] = (uint8_t)((insn & 0x00FF0000) >> 16);
-			bText[bPtr+3] = (uint8_t)((insn & 0xFF000000) >> 24);
+			byteText[bPtr+0] = (uint8_t)((insn & 0x000000FF));
+			byteText[bPtr+1] = (uint8_t)((insn & 0x0000FF00) >>  8);
+			byteText[bPtr+2] = (uint8_t)((insn & 0x00FF0000) >> 16);
+			byteText[bPtr+3] = (uint8_t)((insn & 0xFF000000) >> 24);
 		}
-		text_memory->set_contents(bText);
-		delete[] bText;
+		text_memory->set_contents(byteText);
+		free(byteText);
 	}
 
 	void load_program(std::vector<uint32_t> program) {
@@ -302,6 +302,7 @@ TEST_F(RV32CodeExecution, Fibonacci15) {
 		0x02010113,
 		0x00008067,
 	};
+	load_program(program);
 
 	uint32_t fib[] = {0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610};
 
