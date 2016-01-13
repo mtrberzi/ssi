@@ -270,6 +270,64 @@ TEST_F(RV32CodeExecution, ReturnOnly) {
 	run(1);
 }
 
+TEST_F(RV32CodeExecution, DoubleA0) {
+    // copies the value in a0 to t0,
+    // then adds a0 and t0 and places the result in a0
+    std::vector<uint32_t> program {
+      0x00050293,
+      0x00550533,
+      0x00008067,
+    };
+    load_program(program);
+    set_register(10, 21);
+    run(3);
+    ASSERT_EQ(42, get_register(10));
+}
+
+TEST_F(RV32CodeExecution, Max_Signed) {
+    // puts the larger of a0 and a1 into a0 (signed compare)
+    std::vector<uint32_t> program {
+        0x00a5c463,
+        0x00058513,
+        0x00008067,
+    };
+    load_program(program);
+
+    int32_t testData_a0[] = {1, 12, 4,  -3};
+    int32_t testData_a1[] = {0, 6,  23, -2};
+    int32_t expected_a0[] = {1, 12, 23, -2};
+
+    for (int i = 0; i < 4; ++i) {
+      pc = 0;
+      set_register(10, (uint32_t)testData_a0[i]);
+      set_register(11, (uint32_t)testData_a1[i]);
+      run(3);
+      EXPECT_EQ(expected_a0[i], (int32_t)get_register(10)) << "failed #" << i;
+    }
+}
+
+TEST_F(RV32CodeExecution, Max_Unsigned) {
+    // puts the larger of a0 and a1 into a0 (unsigned compare)
+    std::vector<uint32_t> program {
+        0x00a5e463,
+        0x00058513,
+        0x00008067,
+    };
+    load_program(program);
+
+    uint32_t testData_a0[] = {1, 12, 4,  0xFFFF0000};
+    uint32_t testData_a1[] = {0, 6,  23, 0x0000000F};
+    uint32_t expected_a0[] = {1, 12, 23, 0xFFFF0000};
+
+    for (int i = 0; i < 4; ++i) {
+      pc = 0;
+      set_register(10, testData_a0[i]);
+      set_register(11, testData_a1[i]);
+      run(3);
+      EXPECT_EQ(expected_a0[i], get_register(10)) << " failed #" << i;
+    }
+}
+
 TEST_F(RV32CodeExecution, Fibonacci15) {
 	// call with n in a0, returns fib(n) in a0
 	std::vector<uint32_t> program {
