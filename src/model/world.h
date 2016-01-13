@@ -23,7 +23,7 @@ protected:
 
 class World {
 public:
-	World();
+	World(uint32_t xd, uint32_t yd);
 	~World();
 
 	uint32_t get_xDim() const { return xDim; }
@@ -33,7 +33,7 @@ public:
 	std::unordered_set<VoxelOccupant*> get_occupants(const Vector position) const;
 	std::unordered_set<VoxelOccupant*> get_occupants(const Vector position, const Vector extents) const;
 	bool can_occupy(const Vector position, const VoxelOccupant *occupant) const;
-	bool add_occupant(const Vector position, const Vector subvoxelPosition, VoxelOccupant *obj);
+	bool add_occupant(Vector position, Vector subvoxelPosition, VoxelOccupant *obj);
 	void remove_occupant(VoxelOccupant *obj);
 
 	/*
@@ -56,6 +56,8 @@ protected:
 	std::unordered_map<Vector, std::unordered_set<VoxelOccupant*> > voxels;
 	uint32_t xDim;
 	uint32_t yDim;
+
+	std::vector<VoxelOccupant*> all_occupants; // for memory management
 
 	void create_bedrock_layer();
 
