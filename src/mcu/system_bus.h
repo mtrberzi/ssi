@@ -10,16 +10,18 @@ static uint32_t LAST_VALID_PAGE = 0xFFFFFFFF >> 10;
 
 class SystemBusPeripheral {
 public:
-    SystemBusPeripheral() {}
+    SystemBusPeripheral() : mask(0) {}
     virtual ~SystemBusPeripheral() {}
     virtual uint32_t get_number_of_pages() const = 0;
 
     uint32_t translate_address(uint32_t pAddr) {
-        uint32_t v = get_number_of_pages() * 1024;
-        int firstSetPos = ffs(v);
-        // 1 <= firstSetPos <= 32
-        uint32_t mask = (uint32_t) (1 << firstSetPos);
-        mask -= 1;
+        if (mask == 0) { // only calculate this once
+            uint32_t v = get_number_of_pages() * 1024;
+            int firstSetPos = ffs(v);
+            // 1 <= firstSetPos <= 32
+            mask = (uint32_t) (1 << firstSetPos);
+            mask -= 1;
+        }
         return pAddr & mask;
     }
 
@@ -34,6 +36,8 @@ public:
     virtual void cycle() = 0;
     // called once per timestep after all global cycles have completed
     virtual void timestep() = 0;
+protected:
+    uint32_t mask;
 };
 
 class SystemBus {
