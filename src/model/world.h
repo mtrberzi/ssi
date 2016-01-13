@@ -7,8 +7,19 @@
 #include <vector>
 #include <cmath>
 #include "vector.h"
-#include "voxel_occupant.h"
 #include "transport_tube.h"
+
+class VoxelOccupant;
+
+class WorldUpdateResult {
+public:
+	WorldUpdateResult(bool success) : succeeded(success) {}
+	~WorldUpdateResult() {}
+
+	bool was_successful() const { return succeeded; }
+protected:
+	bool succeeded;
+};
 
 class World {
 public:
@@ -57,7 +68,14 @@ protected:
 			return (1.0 - s) / ds;
 		}
 	}
+};
 
+class WorldUpdate {
+public:
+	WorldUpdate() {}
+	virtual ~WorldUpdate() {}
+
+	virtual WorldUpdateResult apply(World &w);
 };
 
 #endif // _MODEL_WORLD_
