@@ -174,7 +174,7 @@ void RV32Core::execute(uint32_t insn) {
 	uint8_t opcodeTag = (insn & 0x0000007C) >> 2;
 
 	switch (opcodeTag) {
-	// 0: LOAD
+	    // 0: LOAD
 	case 0:
 		execute_LOAD(insn); break;
 		// 1: LOAD-FP
@@ -195,7 +195,7 @@ void RV32Core::execute(uint32_t insn) {
 		// 6: OP-IMM-32
 		// 7: 48b
 		// 8: STORE
-	case 6:
+	case 8:
 		execute_STORE(insn); break;
 		// 9: STORE-FP
 		// 10: custom-1

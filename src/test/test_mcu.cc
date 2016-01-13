@@ -4,6 +4,7 @@
 #include "ram.h"
 #include <cstdint>
 #include <vector>
+#include <iomanip>
 
 static const uint32_t textMemoryBase = 0x00000000;
 static const uint32_t textMemoryPages = 4;
@@ -63,6 +64,13 @@ public:
 			if (pc == retTarget) {
 				return;
 			}
+			// check for weird stuff
+			if (mcause != 0) {
+			    switch (mcause) {
+			    case 2: FAIL() << "illegal instruction at mepc=0x" << std::hex << mepc; break;
+			    default: FAIL() << "unexpected processor trap " << mcause; break;
+			    }
+			}
 		}
 		FAIL() << "CPU did not terminate after " << maxCycles << " steps";
 	}
@@ -91,34 +99,6 @@ TEST_F (RV32CoreTest, SLLI) {
     execute(0b00000000100000001001000010010011);
     ASSERT_EQ(0x0000FF00, get_register(1));
 }
-
-/*
-@Test
-  public void testExecuteSLTI_WritesOne() {
-    // load -5 into x1 and compare it to -1
-    // should place 1 into x2
-    // so SLTI x2, x1, -1
-    RV32_SLTI insn = new RV32_SLTI(0b11111111111100001010000100010011);
-    RV32Core cpu = new RV32Core();
-    cpu.setXRegister(1, -5);
-    cpu.execute(insn);
-    assertEquals(1, cpu.getXRegister(2));
-  }
-
-  @Test
-  public void testExecuteSLTI_WritesZero() {
-    // load 3 into x1 and compare it to -1
-    // should place 0 into x2
-    // so SLTI x2, x1, -1
-    RV32_SLTI insn = new RV32_SLTI(0b11111111111100001010000100010011);
-    RV32Core cpu = new RV32Core();
-    cpu.setXRegister(1, 3);
-    cpu.setXRegister(2, -50); // allows us to check that x2 actually gets written
-    cpu.execute(insn);
-    assertEquals(0, cpu.getXRegister(2));
-  }
-
-*/
 
 TEST_F (RV32CoreTest, SLTI) {
 	// test path: write 1 to rd
