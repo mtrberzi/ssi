@@ -248,6 +248,10 @@ void RV32Core::execute(uint32_t insn) {
 	                    | (insn & 0x00100000) >> (20-11) // [11]
 	                    | (insn & 0x7fe00000) >> (21-1)  // [10:1]
 	                    ;
+	    // sign-extend bit 20
+	    if (imm & 0x00100000) {
+	        imm |= 0xFFE00000;
+	    }
 	    int32_t offset = (int32_t)imm;
 	    int rd = (insn & 0b00000000000000000000111110000000) >> 7;
 	    next_pc = (uint32_t) ((int32_t)pc + offset);
@@ -284,7 +288,7 @@ void RV32Core::execute_LOAD(uint32_t insn) {
 		// sign-extend to 32 bits
 		val = (uint32_t)di;
 		if (di & 0x80) {
-			val += 0xFFFFFF00;
+			val |= 0xFFFFFF00;
 		}
 	} break;
 	case 0b001: // LH
@@ -293,7 +297,7 @@ void RV32Core::execute_LOAD(uint32_t insn) {
 		// sign-extend to 32 bits
 		val = (uint32_t)di;
 		if (di & 0x8000) {
-			val += 0xFFFF0000;
+			val |= 0xFFFF0000;
 		}
 	} break;
 	case 0b010: // LW
@@ -409,7 +413,7 @@ void RV32Core::execute_STORE(uint32_t insn) {
         | (insn & 0b00000000000000000000111110000000) >> 7;
     // sign-extend to 32 bits
     if (imm & 0x00000800) {
-    	imm += 0xFFFFF000;
+    	imm |= 0xFFFFF000;
     }
     int32_t offset = (int32_t)imm;
     int rs2 = (insn & 0b00000001111100000000000000000000) >> 20;

@@ -4,6 +4,7 @@
 #include "ram.h"
 #include <cstdint>
 #include <vector>
+#include <iostream>
 #include <iomanip>
 
 static const uint32_t textMemoryBase = 0x00000000;
