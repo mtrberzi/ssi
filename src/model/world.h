@@ -7,9 +7,9 @@
 #include <vector>
 #include <cmath>
 #include "vector.h"
-#include "transport_tube.h"
 
 class VoxelOccupant;
+class TransportTube;
 
 class WorldUpdateResult {
 public:
@@ -26,9 +26,12 @@ public:
 	World();
 	~World();
 
+	uint32_t get_xDim() const { return xDim; }
+	uint32_t get_yDim() const { return yDim; }
+
 	bool location_in_bounds(const Vector position) const;
-	void get_occupants(const Vector position, std::unordered_set<VoxelOccupant*> &occupant_set);
-	void get_occupants(const Vector position, const Vector extends, std::unordered_set<VoxelOccupant*> &occupant_set);
+	std::unordered_set<VoxelOccupant*> get_occupants(const Vector position) const;
+	std::unordered_set<VoxelOccupant*> get_occupants(const Vector position, const Vector extents) const;
 	bool can_occupy(const Vector position, const VoxelOccupant *occupant) const;
 	bool add_occupant(const Vector position, const Vector subvoxelPosition, VoxelOccupant *obj);
 	void remove_occupant(VoxelOccupant *obj);

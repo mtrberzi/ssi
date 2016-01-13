@@ -70,6 +70,8 @@ public:
 
 	virtual std::vector<WorldUpdate> on_destroy();
 
+	virtual bool is_transport_tube() const { return false; }
+
 protected:
 	UUID uuid;
 	Vector position;
