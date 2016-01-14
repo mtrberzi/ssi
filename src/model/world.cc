@@ -17,7 +17,7 @@ World::~World() {
 
 bool World::location_in_bounds(const Vector position) const {
     if (position.getX() < 0 || position.getY() < 0 || position.getZ() < 0) return false;
-    if (position.getX() >= xDim || position.getY() >= yDim) return false;
+    if ((uint32_t)position.getX() >= xDim || (uint32_t)position.getY() >= yDim) return false;
     return true;
 }
 
