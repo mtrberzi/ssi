@@ -6,8 +6,6 @@
 #include <unordered_set>
 #include <cstring>
 
-static uint32_t LAST_VALID_PAGE = 0xFFFFFFFF >> 10;
-
 class SystemBusPeripheral {
 public:
     SystemBusPeripheral() : mask(0) {}

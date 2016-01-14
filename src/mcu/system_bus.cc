@@ -1,5 +1,7 @@
 #include "system_bus.h"
 
+static const uint32_t LAST_VALID_PAGE = 0xFFFFFFFF >> 10;
+
 SystemBus::SystemBus() {
 
 }
