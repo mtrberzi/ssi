@@ -2,8 +2,8 @@
 
 RV32Core::RV32Core()
 : pc(0), next_pc(0), mstatus_ie(false), mstatus_ie1(false),
-  mscratch(0), mepc(0), mcause(0), mbadaddr(0), instret(0),
-  system_bus(new SystemBus())
+  mscratch(0), mepc(0), mcause(0), mbadaddr(0),
+  system_bus(new SystemBus()), instret(0)
 {
 	for (int i = 0; i < 32; ++i) {
 		xRegister[i] = 0;
@@ -641,7 +641,7 @@ void RV32Core::execute_OP(uint32_t insn) {
         {
             int32_t x1 = (int32_t)get_register(rs1);
             int32_t x2 = (int32_t)get_register(rs2);
-            int64_t product = ((int64_t)rs1)&0x00000000FFFFFFFFL * ((int64_t)rs2)&0x00000000FFFFFFFFL;
+            int64_t product = ((int64_t)x1)&0x00000000FFFFFFFFL * ((int64_t)x2)&0x00000000FFFFFFFFL;
             set_register(rd, (uint32_t)(product >> 32));
         } break;
         case 0b100: // DIV
