@@ -1,9 +1,10 @@
 #include "rv32core.h"
 
 RV32Core::RV32Core()
-: pc(0), next_pc(0), mstatus_ie(false), mstatus_ie1(false),
+: pc(0), next_pc(0), system_bus(new SystemBus()),
+  mstatus_ie(false), mstatus_ie1(false),
   mscratch(0), mepc(0), mcause(0), mbadaddr(0),
-  system_bus(new SystemBus()), instret(0)
+  instret(0)
 {
 	for (int i = 0; i < 32; ++i) {
 		xRegister[i] = 0;
