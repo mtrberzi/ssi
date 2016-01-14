@@ -42,7 +42,7 @@ class RemoveObjectUpdate : public WorldUpdate {
 public:
 	RemoveObjectUpdate(VoxelOccupant * tgt) : target(tgt) {}
 	~RemoveObjectUpdate() {}
-	WorldUpdateResult apply(World &w);
+	WorldUpdateResult apply(World *w);
 protected:
 	VoxelOccupant *target;
 };

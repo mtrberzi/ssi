@@ -80,7 +80,7 @@ public:
 	WorldUpdate() {}
 	virtual ~WorldUpdate() {}
 
-	virtual WorldUpdateResult apply(World &w);
+	virtual WorldUpdateResult apply(World *w);
 };
 
 #endif // _MODEL_WORLD_

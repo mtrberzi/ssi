@@ -15,6 +15,9 @@ endif()
 # Enable all warnings.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-missing-field-initializers")
 
+# Always use the full capabilities of our CPU
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+
 add_subdirectory (mcu)
 add_subdirectory (model)
 add_subdirectory (test)
