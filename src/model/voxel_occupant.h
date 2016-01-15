@@ -7,6 +7,8 @@
 #include "uuid.h"
 #include <vector>
 #include <unordered_map>
+#include <cmath>
+#include "material.h"
 
 class VoxelOccupant {
 public:
@@ -81,5 +83,78 @@ protected:
 
 	int32_t durability;
 };
+
+/**
+ * An Item is a voxel occupant that represents a tool, raw material, or part.
+ * They are always made out of a single material.
+ * Items can be directly manipulated by robots and machines,
+ * and carried by conveyors. Items always occupy
+ * exactly one voxel, cannot move on their own, and must be supported.
+ */
+
+class Item : public VoxelOccupant {
+public:
+    Item(Material *mat) : material(mat) {
+        set_current_durability(get_maximum_durability());
+    }
+    virtual ~Item(){}
+    Material *get_material() const { return material; }
+
+    virtual bool impedesXYMovement() const { return false; }
+    virtual bool impedesZMovement() const { return false; }
+    virtual bool impedesXYFluidFlow() const { return false; }
+    virtual bool impedesZFluidFlow() const { return false; }
+    virtual bool supportsOthers() const { return false; }
+    virtual bool needsSupport() const { return true; }
+    virtual bool canMove() const { return false; }
+    virtual Vector get_extents() const { return Vector(1,1,1); }
+
+    virtual bool requiresTimestep() const { return false; }
+    virtual bool hasWorldUpdates() const { return false; }
+
+    // TODO item durability
+    int32_t get_maximum_durability() const { return 1; }
+
+
+protected:
+    Material *material;
+};
+
+// Machine is defined in machine.h/machine.cc
+
+/**
+ * A Structure is a voxel occupant that typically represents a
+ * terrain feature, building piece, or other non-mechanical large object.
+ * Structures are always made out of a single material and cannot move on their own.
+ * They also cannot be directly manipulated by robots, but can be manipulated
+ * indirectly (e.g. mining out a block or placing a floor tile).
+ * Structures always occupy exactly one voxel.
+ * Every structure has a base durability, which is modified by the material's durability factor
+ * to compute the structure's maximum durability.
+ */
+
+class Structure : public VoxelOccupant {
+public:
+    Structure(Material *m) : material(m) {
+        set_current_durability(get_maximum_durability());
+    }
+    virtual ~Structure() {}
+    Material *get_material() const { return material; }
+
+    virtual Vector get_extents() const { return Vector(1,1,1); }
+    virtual bool canMove() const { return false; }
+    virtual bool requires_timestep() const { return false; }
+    virtual bool hasWorldUpdates() const { return false; }
+    virtual uint16_t get_kind() { return 4; }
+    virtual int32_t get_maximum_durability() {
+        return (int32_t)floor((double)get_base_durability() * get_material()->get_durability_modifier());
+    }
+
+protected:
+    Material *material;
+    virtual int32_t get_base_durability() const = 0;
+};
+
+// TransportTube is defined in transport_tube.h/transport_tube.cc
 
 #endif // _MODEL_VOXEL_OCCUPANT_

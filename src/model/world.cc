@@ -425,4 +425,29 @@ void World::timestep() {
     }
 }
 
-// TODO completion of all World member functions
+void World::create_bedrock_layer() {
+    Vector subvoxelPos(0, 0, 0);
+    for (uint32_t y = 0; y < yDim; ++y) {
+      for (uint32_t x = 0; x < xDim; ++x) {
+        Vector pos((int32_t)x, (int32_t)y, 0);
+        Bedrock bedrock();
+        addOccupant(pos, subvoxelPos, bedrock);
+      }
+    }
+}
+
+void World::remove_transport_tube(TransportTube *transport) {
+    // TODO remove_transport_tube()
+    /*
+    TransportDevice connA = transport.getConnectionA();
+    if (connA != null) {
+      connA.disconnect(transport);
+    }
+    TransportDevice connB = transport.getConnectionB();
+    if (connB != null) {
+      connB.disconnect(transport);
+    }
+    // TODO get contents and dump them somewhere
+    */
+     */
+}
