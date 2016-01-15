@@ -58,10 +58,10 @@ public:
 	virtual bool has_world_updates() const = 0;
 	// this method is always called after the call to timestep(),
 	// but only if hasWorldUpdates() is true
-	virtual std::vector<WorldUpdate> get_world_updates() {
-		return std::vector<WorldUpdate>();
+	virtual std::vector<WorldUpdate*> get_world_updates() {
+		return std::vector<WorldUpdate*>();
 	}
-	virtual void collect_update_results(std::unordered_map<WorldUpdate, WorldUpdateResult> & results) {}
+	virtual void collect_update_results(std::unordered_map<WorldUpdate*, WorldUpdateResult> & results) {}
 
 	// really, really simplistic "damage" system
 	virtual int32_t get_current_durability() const { return durability; }

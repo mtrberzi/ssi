@@ -49,7 +49,7 @@ std::unordered_set<VoxelOccupant*> World::get_occupants(const Vector position, c
 	return std::unordered_set<VoxelOccupant*>(allOccupants);
 }
 
-bool World::can_occupy(const Vector position, const VoxelOccupant *obj) const {
+bool World::can_occupy(Vector position, const VoxelOccupant *obj) const {
 	if (obj == NULL) return false;
 	if (!location_in_bounds(position)) return false;
 
@@ -143,7 +143,7 @@ template <typename T> int sgn(T val) {
  * not including the origin itself but including the endpoint
  * (unless the endpoint coincides with the origin)
  */
-std::vector<Vector> World::raycast(const Vector origin, const Vector direction) const {
+std::vector<Vector> World::raycast(Vector origin, Vector direction) const {
 	std::vector<Vector> visitedVoxels;
 
 	int x = origin.getX();
@@ -208,7 +208,7 @@ Vector World::calculate_trajectory(VoxelOccupant *obj, std::vector<Vector> &traj
     Vector currentPosition = obj->get_position();
     Vector nextPosition = currentPosition;
     while (!trajectory.empty()) {
-        nextPosition = trajectory.pop_front();
+        nextPosition = trajectory.front(); trajectory.pop_front();
         // based on what we so far believe to be the next position,
         // if at this point we can't actually move into that voxel coming from
         // that direction, we don't make any further moves
@@ -340,7 +340,7 @@ void World::timestep() {
     }
 
     // perform world updates
-    std::unordered_map<VoxelOccupant*, std::vector<WorldUpdate>> worldUpdates;
+    std::unordered_map<VoxelOccupant*, std::vector<WorldUpdate*>> worldUpdates;
     for (auto elem : voxels) {
         std::unordered_set<VoxelOccupant*> &occupants = elem.second;
         for (VoxelOccupant *occupant : occupants) {
@@ -350,12 +350,12 @@ void World::timestep() {
         }
     }
     for (auto entry : worldUpdates) {
-        VoxelOccupant *obj = entry.first();
-        std::vector<WorldUpdate> &updates = entry.second();
-        std::unordered_map<WorldUpdate, WorldUpdateResult> results;
-        for (WorldUpdate update : updates) {
-            WorldUpdateResult result = update.apply(this);
-            results[update] = result;
+        VoxelOccupant *obj = entry.first;
+        std::vector<WorldUpdate*> &updates = entry.second;
+        std::unordered_map<WorldUpdate*, WorldUpdateResult> results;
+        for (WorldUpdate* update : updates) {
+            WorldUpdateResult result = update->apply(this);
+            results.insert(std::unordered_map<WorldUpdate*, WorldUpdateResult>::value_type(update, result));
         }
         obj->collect_update_results(results);
     }
@@ -366,8 +366,8 @@ void World::timestep() {
         std::unordered_set<VoxelOccupant*> &occupants = elem.second;
         for (VoxelOccupant *occupant : occupants) {
             // if velocity component is non-zero, the object is moving
-            if (!occupant->get_subvoxel_velocity() == zeroVector
-                    || !occupant->get_velocity() == zeroVector) {
+            if (!(occupant->get_subvoxel_velocity() == zeroVector)
+                    || !(occupant->get_velocity() == zeroVector)) {
                 movingObjects.insert(occupant);
             }
         }
@@ -416,7 +416,7 @@ void World::timestep() {
         newPos = Vector(newX, newY, newZ);
         newSVPos = Vector(newX_sv, newY_sv, newZ_sv);
 
-        std::vector<Vector> &visitedPositions = raycast(obj->get_position(), newPos - obj->get_position());
+        std::vector<Vector> visitedPositions = raycast(obj->get_position(), newPos - obj->get_position());
         newPos = calculate_trajectory(obj, visitedPositions);
         // now newPos and newSVPos are correct;
         // we remove the object from its old position and add it to its new one

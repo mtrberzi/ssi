@@ -7,6 +7,7 @@
 #include <vector>
 #include <cmath>
 #include "vector.h"
+#include <functional>
 
 class VoxelOccupant;
 class TransportTube;
@@ -32,7 +33,7 @@ public:
 	bool location_in_bounds(const Vector position) const;
 	std::unordered_set<VoxelOccupant*> get_occupants(const Vector position) const;
 	std::unordered_set<VoxelOccupant*> get_occupants(const Vector position, const Vector extents) const;
-	bool can_occupy(const Vector position, const VoxelOccupant *occupant) const;
+	bool can_occupy(Vector position, const VoxelOccupant *occupant) const;
 	bool add_occupant(Vector position, Vector subvoxelPosition, VoxelOccupant *obj);
 	void remove_occupant(VoxelOccupant *obj);
 
@@ -42,7 +43,7 @@ public:
 	 * stopping when the voxel at (origin + direction) is reached
 	 * or when the resulting position would be outside of the world.
 	 */
-	std::vector<Vector> raycast(const Vector origin, const Vector direction) const;
+	std::vector<Vector> raycast(Vector origin, Vector direction) const;
 
 	/*
 	 * Computes the rest position of `obj` as it moves through each voxel of `traj` in turn.
@@ -82,5 +83,14 @@ public:
 
 	virtual WorldUpdateResult apply(World *w);
 };
+
+namespace std {
+    template <> struct hash<WorldUpdate> {
+        size_t operator() (const WorldUpdate &w) const {
+            // TODO better hash function
+            return 0;
+        }
+    };
+}
 
 #endif // _MODEL_WORLD_
