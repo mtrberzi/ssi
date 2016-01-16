@@ -1,4 +1,4 @@
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${LIBXML2_INCLUDE_DIR})
 
 set(MODEL_SRCS 
   world.cc world.h world_updates.cc world_updates.h time_constants.h vector.cc vector.h

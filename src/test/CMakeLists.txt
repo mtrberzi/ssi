@@ -9,3 +9,5 @@ add_test (TestMCU test_mcu)
 add_executable (test_model_vector test_model_vector.cc)
 target_link_libraries (test_model_vector ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} model)
 add_test (TestModel_Vector test_model_vector)
+
+# target_link_libraries(SSI ${LIBXML2_LIBRARIES})

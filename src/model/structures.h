@@ -33,7 +33,7 @@ public:
         return false;
     }
 
-    virtual uint32_t getType() const {
+    virtual uint32_t get_type() const {
         return 0;
     }
 

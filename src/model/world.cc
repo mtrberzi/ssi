@@ -2,6 +2,7 @@
 #include "voxel_occupant.h"
 #include "transport_tube.h"
 #include "time_constants.h"
+#include "structures.h"
 #include <algorithm>
 #include <deque>
 
@@ -430,8 +431,8 @@ void World::create_bedrock_layer() {
     for (uint32_t y = 0; y < yDim; ++y) {
       for (uint32_t x = 0; x < xDim; ++x) {
         Vector pos((int32_t)x, (int32_t)y, 0);
-        Bedrock bedrock();
-        addOccupant(pos, subvoxelPos, bedrock);
+        Bedrock *bedrock = new Bedrock();
+        add_occupant(pos, subvoxelPos, bedrock);
       }
     }
 }
@@ -449,5 +450,4 @@ void World::remove_transport_tube(TransportTube *transport) {
     }
     // TODO get contents and dump them somewhere
     */
-     */
 }

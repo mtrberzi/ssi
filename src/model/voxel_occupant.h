@@ -28,8 +28,8 @@ public:
 	virtual bool needsSupport() const = 0;
 	virtual bool canMove() const = 0;
 
-	virtual uint16_t get_kind() = 0;
-	virtual uint32_t get_type() = 0; // more specific than kind, but sometimes unavailable
+	virtual uint16_t get_kind() const = 0;
+	virtual uint32_t get_type() const = 0; // more specific than kind, but sometimes unavailable
 
 	Vector get_position() const { return position; }
 	void set_position(Vector & p ) { position = p; }
@@ -144,9 +144,9 @@ public:
     virtual Vector get_extents() const { return Vector(1,1,1); }
     virtual bool canMove() const { return false; }
     virtual bool requires_timestep() const { return false; }
-    virtual bool hasWorldUpdates() const { return false; }
-    virtual uint16_t get_kind() { return 4; }
-    virtual int32_t get_maximum_durability() {
+    virtual bool has_world_updates() const { return false; }
+    virtual uint16_t get_kind() const { return 4; }
+    virtual int32_t get_maximum_durability() const {
         return (int32_t)floor((double)get_base_durability() * get_material()->get_durability_modifier());
     }
 
