@@ -8,4 +8,5 @@ set(MODEL_SRCS
 
 add_library(model STATIC ${MODEL_SRCS})
 target_include_directories(model PUBLIC "${SSI_SOURCE_DIR}/model")
+target_link_libraries(model ${LIBXML2_LIBRARIES})
 

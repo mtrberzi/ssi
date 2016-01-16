@@ -6,6 +6,13 @@
 #include <unordered_map>
 
 class MaterialLibrary {
+protected:
+    std::unordered_map<std::string, Material*> materials;
+
+    static MaterialLibrary *instance;
+    MaterialLibrary();
+
+    void init();
 public:
     static MaterialLibrary *inst() {
         if (!instance) {
@@ -22,13 +29,7 @@ public:
     Material *get_material(std::string material_name) const;
     void clear();
 
-protected:
-    std::unordered_map<std::string, Material*> materials;
-
-    static MaterialLibrary *instance;
-    MaterialLibrary();
-
-    void init();
+    std::unordered_map<std::string, Material*> get_all_materials() const;
 };
 
 #endif // _MODEL_MATERIAL_LIBRARY_
