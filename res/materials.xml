@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <materials>
-	<material name="iron" type="1" durabilityModifier="0.9">
+	<material name="iron" type="2" durabilityModifier="0.9">
 		<categories>
 			<category name="metal"/>
 		</categories>
@@ -9,7 +9,7 @@
 		</miningProducts>
 	</material>
 	
-	<material name="quartz" type="2" durabilityModifier="1.3">
+	<material name="quartz" type="3" durabilityModifier="1.3">
 		<categories>
 			<category name="crystal"/>
 		</categories>
