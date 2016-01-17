@@ -23,7 +23,10 @@ public:
 };
 
 TEST_F (TestMaterialLibrary, Loads) {
+    ASSERT_TRUE(MaterialLibrary::inst()->get_all_materials().size() == 1); // only bedrock
     ASSERT_TRUE(MaterialLibrary::inst()->load(path));
+    // assert that something was loaded
+    ASSERT_TRUE(MaterialLibrary::inst()->get_all_materials().size() > 1);
 }
 
 TEST_F (TestMaterialLibrary, NoDuplicateIDs) {

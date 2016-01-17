@@ -12,32 +12,35 @@ MaterialLibrary::MaterialLibrary() {
 }
 
 MaterialLibrary::~MaterialLibrary() {
-    // TODO delete all materials
+    for (Material *m : materials) {
+        delete m;
+    }
 }
 
 void MaterialLibrary::init() {
     // the material library always contains a material named "bedrock"
-    // TODO make bedrock
-    /*
-    MaterialBuilder bedrockBuilder = new MaterialBuilder();
-    bedrockBuilder.setMaterialName("bedrock");
-    bedrockBuilder.setType(0);
-    bedrockBuilder.setDurabilityModifier(9999.0);
-    addMaterial("bedrock", bedrockBuilder.build());
-    */
+    MaterialBuilder bedrockBuilder;
+    bedrockBuilder.set_name("bedrock");
+    bedrockBuilder.set_type("0");
+    bedrockBuilder.set_durability_modifier("9999.0");
+    // TODO assert bedrockBuilder.can_build()
+    add_material("bedrock", bedrockBuilder.build());
 }
 
 void MaterialLibrary::add_material(std::string name, Material *material) {
-    // TODO add_material
+    // TODO assert no duplicates
+    materials[name] = material;
 }
 
 Material *MaterialLibrary::get_material(std::string name) const {
-    // TODO get_material
-    return NULL;
+    return materials[name];
 }
 
 void MaterialLibrary::clear() {
-    // TODO clear
+    for (Material *m : materials) {
+        delete m;
+    }
+    init();
 }
 
 std::unordered_map<std::string, Material*> MaterialLibrary::get_all_materials() const {
@@ -174,11 +177,14 @@ static xmlSAXHandler handler = init_sax_handler();
 
 bool MaterialLibrary::load(std::string filepath) {
     struct ParserData parser;
+    // TODO all failure cases should delete unused builders, etc.
     if (xmlSAXUserParseFile(&handler, &parser, filepath.c_str()) < 0) {
         return false;
     } else {
         if (parser.success) {
-            // TODO insert into database, etc.
+            for (Material *m : parser.final_materials) {
+                add_material(m->get_name(), m);
+            }
             return true;
         } else {
             return false;
