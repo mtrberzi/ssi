@@ -5,8 +5,6 @@
 #include "material.h"
 #include "material_library.h"
 
-// TODO material library tests
-
 std::string path;
 
 class TestMaterialLibrary : public ::testing::Test {
