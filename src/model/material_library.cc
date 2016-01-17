@@ -12,8 +12,8 @@ MaterialLibrary::MaterialLibrary() {
 }
 
 MaterialLibrary::~MaterialLibrary() {
-    for (Material *m : materials) {
-        delete m;
+    for (auto entry : materials) {
+        delete entry.second;
     }
 }
 
@@ -21,7 +21,7 @@ void MaterialLibrary::init() {
     // the material library always contains a material named "bedrock"
     MaterialBuilder bedrockBuilder;
     bedrockBuilder.set_name("bedrock");
-    bedrockBuilder.set_type("0");
+    bedrockBuilder.set_type("1");
     bedrockBuilder.set_durability_modifier("9999.0");
     // TODO assert bedrockBuilder.can_build()
     add_material("bedrock", bedrockBuilder.build());
@@ -33,12 +33,17 @@ void MaterialLibrary::add_material(std::string name, Material *material) {
 }
 
 Material *MaterialLibrary::get_material(std::string name) const {
-    return materials[name];
+    std::unordered_map<std::string, Material*>::const_iterator it = materials.find(name);
+    if (it == materials.end()) {
+        return NULL;
+    } else {
+        return it->second;
+    }
 }
 
 void MaterialLibrary::clear() {
-    for (Material *m : materials) {
-        delete m;
+    for (auto entry : materials) {
+        delete entry.second;
     }
     init();
 }
