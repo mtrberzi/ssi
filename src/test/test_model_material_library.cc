@@ -22,6 +22,14 @@ public:
 
 };
 
+TEST_F (TestMaterialLibrary, HasBedrock) {
+    Material *m = MaterialLibrary::inst()->get_material("bedrock");
+    ASSERT_TRUE(m != NULL);
+    std::string expected_name("bedrock");
+    std::string actual_name = m->get_name();
+    ASSERT_TRUE(expected_name.compare(actual_name) == 0);
+}
+
 TEST_F (TestMaterialLibrary, Loads) {
     ASSERT_TRUE(MaterialLibrary::inst()->get_all_materials().size() == 1); // only bedrock
     ASSERT_TRUE(MaterialLibrary::inst()->load(path));
