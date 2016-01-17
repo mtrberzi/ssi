@@ -81,7 +81,7 @@ public:
 	WorldUpdate() {}
 	virtual ~WorldUpdate() {}
 
-	virtual WorldUpdateResult apply(World *w);
+	virtual WorldUpdateResult apply(World *w) { return WorldUpdateResult(false); }
 };
 
 namespace std {

@@ -123,5 +123,6 @@ bool TransportTube::receive(TransportDevice *neighbour, Item *item) {
         }
     } else {
         // do nothing; cannot receive from an unconnected device
+        return false;
     }
 }

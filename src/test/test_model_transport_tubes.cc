@@ -49,7 +49,20 @@ TEST_F (TestTransportTubes, UnconnectedEndpoint_CannotReceive) {
 }
 
 TEST_F (TestTransportTubes, CreateTransport) {
-    create_transport_tube(Vector(0, 0, 1), 1);
+    Vector position(0,0,1);
+    uint32_t txID = 1;
+    create_transport_tube(position, txID);
+    bool found_ok = false;
+    auto occupants = world->get_occupants(position);
+    for (VoxelOccupant *occ : occupants) {
+        if (!(occ->is_transport_tube())) continue;
+        TransportTube *transport = (TransportTube*)occ;
+        if (transport->get_transport_id() == txID) {
+            found_ok = true;
+            break;
+        }
+    }
+    ASSERT_TRUE(found_ok) << "could not find transport tube with matching ID at target position";
 }
 
 TEST_F (TestTransportTubes, ConnectTransport) {
