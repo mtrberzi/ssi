@@ -15,21 +15,6 @@ public:
     TestItem() : Item(MaterialLibrary::inst()->get_material("bedrock")) {}
     virtual uint16_t get_kind() const { return 0; }
     virtual uint32_t get_type() const { return 0; }
-    /*
-    public TestItem() {
-      super(MaterialLibrary.getInstance().getMaterial("bedrock"));
-    }
-
-    @Override
-    public short getKind() {
-      return (short)0;
-    }
-
-    @Override
-    public int getType() {
-      return 0;
-    }
-    */
 };
 
 class TestEndpoint : public TransportEndpoint {
@@ -124,7 +109,10 @@ TEST_F (TestTransportTubes, UnconnectedEndpoint_CannotSend) {
 }
 
 TEST_F (TestTransportTubes, UnconnectedEndpoint_CannotReceive) {
-    FAIL() << "not implemented yet";
+    TestEndpoint *ept1 = new TestEndpoint();
+    ASSERT_TRUE(world->add_occupant(Vector(0,0,1), Vector(0,0,0), ept1));
+    world->timestep();
+    ASSERT_TRUE(ept1->itemsReceived.empty());
 }
 
 TEST_F (TestTransportTubes, CreateTransport) {
@@ -145,7 +133,53 @@ TEST_F (TestTransportTubes, CreateTransport) {
 }
 
 TEST_F (TestTransportTubes, ConnectTransport) {
-    FAIL() << "not implemented yet";
+    /*
+    World w = new World(5, 10);
+    createTransportTube(w, new Vector(0, 0, 1), "a");
+    createTransportTube(w, new Vector(1, 0, 1), "a");
+    connectTransportTubes(w, "a", new Vector(0, 0, 1), new Vector(1, 0, 1));
+    List<TransportTube> tubes1 = w.getOccupants(new Vector(0, 0, 1)).stream()
+        .filter((o -> o instanceof TransportTube)).map((o -> (TransportTube)o)).collect(Collectors.toList());
+    List<TransportTube> tubes2 = w.getOccupants(new Vector(1, 0, 1)).stream()
+        .filter((o -> o instanceof TransportTube)).map((o -> (TransportTube)o)).collect(Collectors.toList());
+    assertEquals(1, tubes1.size());
+    assertEquals(1, tubes2.size());
+
+    TransportTube t1 = tubes1.get(0);
+    TransportTube t2 = tubes2.get(0);
+    assertEquals(1, t1.getNumberOfConnectedDevices());
+    assertEquals(1, t2.getNumberOfConnectedDevices());
+    assertTrue(t1.getConnectionA() == t2 || t1.getConnectionB() == t2);
+    assertTrue(t2.getConnectionA() == t1 || t2.getConnectionB() == t1);
+    */
+    create_transport_tube(Vector(0,0,1), 1);
+    create_transport_tube(Vector(1,0,1), 1);
+    connect_transport_tubes(1, Vector(0,0,1), Vector(1,0,1));
+
+    // collect a list of all transport tubes at each position
+    std::vector<TransportTube*> tubes1;
+    std::vector<TransportTube*> tubes2;
+
+    for (VoxelOccupant *entry : world->get_occupants(Vector(0,0,1))) {
+        if (entry->is_transport_tube()) {
+            tubes1.push_back((TransportTube*)entry);
+        }
+    }
+    for (VoxelOccupant *entry : world->get_occupants(Vector(1,0,1))) {
+        if (entry->is_transport_tube()) {
+            tubes2.push_back((TransportTube*)entry);
+        }
+    }
+    ASSERT_EQ(1, tubes1.size()) << "could not find transport tube at location 1";
+    ASSERT_EQ(1, tubes2.size()) << "could not find transport tube at location 2";
+
+    TransportTube *t1 = tubes1.at(0);
+    TransportTube *t2 = tubes2.at(0);
+    ASSERT_EQ(1, t1->get_number_of_connected_devices()) << "wrong number of devices connected to t1";
+    ASSERT_EQ(1, t2->get_number_of_connected_devices()) << "wrong number of devices connected to t2";
+
+    ASSERT_TRUE(t1->get_connectionA() == t2 || t1->get_connectionB() == t2) << "t1 not connected to t2";
+    ASSERT_TRUE(t2->get_connectionA() == t1 || t2->get_connectionB() == t1) << "t2 not connected to t1";
 }
 
 TEST_F (TestTransportTubes, ConnectEndpoint) {
