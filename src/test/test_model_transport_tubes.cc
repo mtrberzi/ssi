@@ -4,6 +4,8 @@
 #include "world_updates.h"
 #include "transport_endpoint.h"
 #include "transport_tube.h"
+#include "material_library.h"
+
 #include <cstdint>
 #include <queue>
 #include <vector>

@@ -1,4 +1,5 @@
 #include "transport_endpoint.h"
+#include "transport_tube.h"
 
 bool TransportEndpoint::is_valid_endpoint(uint32_t endpointID) const {
     auto epts = get_transport_endpoints();
