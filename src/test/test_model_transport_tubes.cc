@@ -133,25 +133,6 @@ TEST_F (TestTransportTubes, CreateTransport) {
 }
 
 TEST_F (TestTransportTubes, ConnectTransport) {
-    /*
-    World w = new World(5, 10);
-    createTransportTube(w, new Vector(0, 0, 1), "a");
-    createTransportTube(w, new Vector(1, 0, 1), "a");
-    connectTransportTubes(w, "a", new Vector(0, 0, 1), new Vector(1, 0, 1));
-    List<TransportTube> tubes1 = w.getOccupants(new Vector(0, 0, 1)).stream()
-        .filter((o -> o instanceof TransportTube)).map((o -> (TransportTube)o)).collect(Collectors.toList());
-    List<TransportTube> tubes2 = w.getOccupants(new Vector(1, 0, 1)).stream()
-        .filter((o -> o instanceof TransportTube)).map((o -> (TransportTube)o)).collect(Collectors.toList());
-    assertEquals(1, tubes1.size());
-    assertEquals(1, tubes2.size());
-
-    TransportTube t1 = tubes1.get(0);
-    TransportTube t2 = tubes2.get(0);
-    assertEquals(1, t1.getNumberOfConnectedDevices());
-    assertEquals(1, t2.getNumberOfConnectedDevices());
-    assertTrue(t1.getConnectionA() == t2 || t1.getConnectionB() == t2);
-    assertTrue(t2.getConnectionA() == t1 || t2.getConnectionB() == t1);
-    */
     create_transport_tube(Vector(0,0,1), 1);
     create_transport_tube(Vector(1,0,1), 1);
     connect_transport_tubes(1, Vector(0,0,1), Vector(1,0,1));
@@ -183,7 +164,23 @@ TEST_F (TestTransportTubes, ConnectTransport) {
 }
 
 TEST_F (TestTransportTubes, ConnectEndpoint) {
-    FAIL() << "not implemented yet";
+    /*
+    World w = new World(5, 10);
+    TestEndpoint ept1 = new TestEndpoint();
+    assertTrue(w.addOccupant(new Vector(0, 0, 1), new Vector(0, 0, 0), ept1));
+    createTransportTube(w, new Vector(0, 0, 1), "a");
+    connectEndpoint(w, "a", new Vector(0, 0, 1), ept1, "output");
+
+    List<TransportTube> tubes = w.getOccupants(new Vector(0, 0, 1)).stream()
+        .filter((o -> o instanceof TransportTube)).map((o -> (TransportTube)o)).collect(Collectors.toList());
+    assertEquals(1, tubes.size());
+    TransportTube t1 = tubes.get(0);
+    assertEquals(1, t1.getNumberOfConnectedDevices());
+    assertTrue(t1.getConnectionA() == ept1 || t1.getConnectionB() == ept1);
+
+    assertEquals(t1, ept1.getConnectedTransport("output"));
+    */
+
 }
 
 TEST_F (TestTransportTubes, Send_HalfDuplex) {
