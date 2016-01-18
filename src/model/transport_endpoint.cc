@@ -41,7 +41,7 @@ bool TransportEndpoint::connect(uint32_t endpointID, TransportTube *transport) {
     return true;
 }
 
-virtual void TransportEndpoint::disconnect(TransportDevice *dev) {
+void TransportEndpoint::disconnect(TransportDevice *dev) {
     if (!(dev->is_transport_tube())) return;
     TransportTube *transport = (TransportTube*)dev;
     uint32_t eptID = get_endpoint_id(transport);
@@ -51,7 +51,7 @@ virtual void TransportEndpoint::disconnect(TransportDevice *dev) {
     }
 }
 
-virtual bool TransportEndpoint::receive(TransportDevice *neighbour, Item *item) {
+bool TransportEndpoint::receive(TransportDevice *neighbour, Item *item) {
     if (neighbour->is_transport_tube()) {
         // if the item is null, it is an empty slot; absorb it
         if (item == NULL) {
