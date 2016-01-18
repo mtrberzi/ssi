@@ -17,6 +17,8 @@ public:
        * (e.g. no space left)
        */
     virtual bool receive(TransportDevice *neighbour, Item *item) = 0;
+
+    virtual bool is_transport_tube() const { return false; }
 };
 
 #endif // _MODEL_TRANSPORT_DEVICE_

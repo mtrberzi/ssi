@@ -2,8 +2,81 @@
 #include "vector.h"
 #include "world.h"
 #include "world_updates.h"
+#include "transport_endpoint.h"
 #include "transport_tube.h"
 #include <cstdint>
+#include <queue>
+#include <vector>
+
+class TestItem : public Item {
+public:
+    TestItem() : Item(MaterialLibrary::inst()->get_material("bedrock")) {}
+    virtual uint16_t get_kind() const { return 0; }
+    virtual uint32_t get_type() const { return 0; }
+    /*
+    public TestItem() {
+      super(MaterialLibrary.getInstance().getMaterial("bedrock"));
+    }
+
+    @Override
+    public short getKind() {
+      return (short)0;
+    }
+
+    @Override
+    public int getType() {
+      return 0;
+    }
+    */
+};
+
+class TestEndpoint : public TransportEndpoint {
+public:
+    TestEndpoint() {}
+    virtual ~TestEndpoint() {}
+    virtual Vector get_extents() const { return Vector(1,1,1); }
+    virtual uint32_t get_type() const { return 0; }
+    virtual bool has_world_updates() const { return false; }
+
+    virtual std::unordered_set<uint32_t> get_transport_endpoints() const {
+        // 0 = input, 1 = output
+        return std::unordered_set<uint32_t> {0, 1};
+    }
+
+    std::vector<Item*> itemsReceived;
+    virtual bool receive_to_endpoint(uint32_t endpointID, Item *item) {
+        if (endpointID == 0) {
+            itemsReceived.push_back(item);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    std::queue<Item*> sendQueue;
+    void queue_output(Item *i) {
+        sendQueue.push(i);
+    }
+
+protected:
+    virtual void pre_send_timestep() {
+        if (!(sendQueue.empty())) {
+            Item *i = sendQueue.front();
+            set_endpoint_output(1, i);
+        }
+    }
+
+    virtual void post_send_timestep(std::unordered_map<uint32_t, bool> send_results) {
+        auto result = send_results.find(1);
+        if (result != send_results.end()) {
+            bool status = result->second;
+            if (status) {
+                // remove the item that was sent
+                sendQueue.pop();
+            }
+        }
+    }
+};
 
 class TestTransportTubes : public ::testing::Test {
 public:
@@ -41,7 +114,11 @@ public:
 // TODO port the rest of IntTestTransportTubes here
 
 TEST_F (TestTransportTubes, UnconnectedEndpoint_CannotSend) {
-    FAIL() << "not implemented yet";
+    TestEndpoint *ept1 = new TestEndpoint();
+    ASSERT_TRUE(world->add_occupant(Vector(0,0,1), Vector(0,0,0), ept1));
+    ept1->queue_output(new TestItem());
+    world->timestep();
+    ASSERT_FALSE(ept1->sendQueue.empty());
 }
 
 TEST_F (TestTransportTubes, UnconnectedEndpoint_CannotReceive) {

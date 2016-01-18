@@ -109,8 +109,8 @@ public:
     virtual bool canMove() const { return false; }
     virtual Vector get_extents() const { return Vector(1,1,1); }
 
-    virtual bool requiresTimestep() const { return false; }
-    virtual bool hasWorldUpdates() const { return false; }
+    virtual bool requires_timestep() const { return false; }
+    virtual bool has_world_updates() const { return false; }
 
     // TODO item durability
     int32_t get_maximum_durability() const { return 1; }

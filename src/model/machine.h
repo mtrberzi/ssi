@@ -14,6 +14,12 @@
 
 class Machine : public VoxelOccupant {
     // TODO Machine class
+
+
+    virtual uint16_t get_kind() const { return 3; }
+    // TODO machine durability
+    virtual uint32_t get_maximum_durability() const { return 1; }
+    virtual bool requires_timestep() const { return true; }
 };
 
 #endif // _MODEL_MACHINE_H_
