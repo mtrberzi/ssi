@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <queue>
 #include <vector>
+#include <algorithm>
 
 class TestItem : public Item {
 public:
@@ -164,22 +165,6 @@ TEST_F (TestTransportTubes, ConnectTransport) {
 }
 
 TEST_F (TestTransportTubes, ConnectEndpoint) {
-    /*
-    World w = new World(5, 10);
-    TestEndpoint ept1 = new TestEndpoint();
-    assertTrue(w.addOccupant(new Vector(0, 0, 1), new Vector(0, 0, 0), ept1));
-    createTransportTube(w, new Vector(0, 0, 1), "a");
-    connectEndpoint(w, "a", new Vector(0, 0, 1), ept1, "output");
-
-    List<TransportTube> tubes = w.getOccupants(new Vector(0, 0, 1)).stream()
-        .filter((o -> o instanceof TransportTube)).map((o -> (TransportTube)o)).collect(Collectors.toList());
-    assertEquals(1, tubes.size());
-    TransportTube t1 = tubes.get(0);
-    assertEquals(1, t1.getNumberOfConnectedDevices());
-    assertTrue(t1.getConnectionA() == ept1 || t1.getConnectionB() == ept1);
-
-    assertEquals(t1, ept1.getConnectedTransport("output"));
-    */
     TestEndpoint *ept1 = new TestEndpoint();
     ASSERT_TRUE(world->add_occupant(Vector(0,0,1), Vector(0,0,0), ept1));
     create_transport_tube(Vector(0,0,1), 1);
@@ -200,7 +185,82 @@ TEST_F (TestTransportTubes, ConnectEndpoint) {
 }
 
 TEST_F (TestTransportTubes, Send_HalfDuplex) {
-    FAIL() << "not implemented yet";
+	TestEndpoint *ept1 = new TestEndpoint();
+	TestEndpoint *ept2 = new TestEndpoint();
+	Vector ept1_pos(0,0,1);
+	Vector ept2_pos(1,0,1);
+	ASSERT_TRUE(world->add_occupant(ept1_pos, Vector(0,0,0), ept1));
+	ASSERT_TRUE(world->add_occupant(ept2_pos, Vector(0,0,0), ept2));
+
+	uint32_t transportID = 1;
+	create_transport_tube(ept1_pos, transportID);
+	create_transport_tube(ept2_pos, transportID);
+	connect_transport_tubes(transportID, ept1_pos, ept2_pos);
+	connect_endpoint(transportID, ept1_pos, ept1, 1);
+	connect_endpoint(transportID, ept2_pos, ept2, 0);
+
+	// find transport tubes t1 and t2
+	std::vector<TransportTube*> tubes1;
+	for (VoxelOccupant *entry : world->get_occupants(ept1_pos)) {
+		if (entry->is_transport_tube()) {
+			tubes1.push_back((TransportTube*)entry);
+		}
+	}
+	std::vector<TransportTube*> tubes2;
+	for (VoxelOccupant *entry : world->get_occupants(ept2_pos)) {
+		if (entry->is_transport_tube()) {
+			tubes2.push_back((TransportTube*)entry);
+		}
+	}
+	ASSERT_EQ(1, tubes1.size());
+	ASSERT_EQ(1, tubes2.size());
+	TransportTube *t1 = tubes1.at(0);
+	TransportTube *t2 = tubes2.at(0);
+
+	// now send an item from ept1 to ept2
+	TestItem *i = new TestItem();
+	ept1->queue_output(i);
+
+	// time t=1: item should move from ept1 into t1
+	world->timestep();
+	{
+		ASSERT_TRUE(ept1->sendQueue.empty()) << "item still at ept1";
+		auto t1_contents = t1->get_contents();
+		ASSERT_TRUE(std::find(t1_contents.begin(), t1_contents.end(), i) != t1_contents.end())
+			<< "item not found in t1";
+		auto t2_contents = t2->get_contents();
+		ASSERT_FALSE(std::find(t2_contents.begin(), t2_contents.end(), i) != t2_contents.end())
+			<< "item unexpectedly found in t2";
+		ASSERT_TRUE(ept2->itemsReceived.empty()) << "item unexpectedly found in ept2";
+	}
+
+	// time t=2: item should move from t1 into t2
+	world->timestep();
+	{
+		ASSERT_TRUE(ept1->sendQueue.empty()) << "item unexpectedly found in ept1";
+		auto t1_contents = t1->get_contents();
+		ASSERT_FALSE(std::find(t1_contents.begin(), t1_contents.end(), i) != t1_contents.end())
+			<< "item still in t1";
+		auto t2_contents = t2->get_contents();
+		ASSERT_TRUE(std::find(t2_contents.begin(), t2_contents.end(), i) != t2_contents.end())
+			<< "item not found in t2";
+		ASSERT_TRUE(ept2->itemsReceived.empty()) << "item unexpectedly found in ept2";
+	}
+
+	// time t=3: item should move from t2 into ept2
+	world->timestep();
+	{
+		ASSERT_TRUE(ept1->sendQueue.empty()) << "item unexpectedly found in ept1";
+		auto t1_contents = t1->get_contents();
+		ASSERT_FALSE(std::find(t1_contents.begin(), t1_contents.end(), i) != t1_contents.end())
+			<< "item unexpectedly found in t1";
+		auto t2_contents = t2->get_contents();
+		ASSERT_FALSE(std::find(t2_contents.begin(), t2_contents.end(), i) != t2_contents.end())
+			<< "item still in t2";
+		auto ept2_contents = ept2->itemsReceived;
+		ASSERT_TRUE(std::find(ept2_contents.begin(), ept2_contents.end(), i) != ept2_contents.end())
+			<< "item did not arrive at ept2";
+	}
 }
 
 TEST_F (TestTransportTubes, Send_FullDuplex) {
