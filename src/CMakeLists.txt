@@ -25,6 +25,8 @@ link_libraries(${LIBXML2_LIBRARIES})
 
 add_subdirectory (mcu)
 add_subdirectory (model)
+add_subdirectory (items)
+add_subdirectory (machines)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   enable_testing()

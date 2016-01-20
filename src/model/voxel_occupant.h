@@ -113,7 +113,7 @@ public:
     virtual bool has_world_updates() const { return false; }
 
     // TODO item durability
-    int32_t get_maximum_durability() const { return 1; }
+    virtual int32_t get_maximum_durability() const { return 1; }
 
 
 protected:

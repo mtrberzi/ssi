@@ -2,8 +2,9 @@
 #define _MACHINES_SMELTER_
 
 #include <cstdint>
-#include "transport_endpoint.h"
 #include <queue>
+#include "transport_endpoint.h"
+#include "ore.h"
 
 /*
  * A Smelter is a machine that refines smeltable ore into bars of material
