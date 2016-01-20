@@ -180,7 +180,23 @@ TEST_F (TestTransportTubes, ConnectEndpoint) {
 
     assertEquals(t1, ept1.getConnectedTransport("output"));
     */
+    TestEndpoint *ept1 = new TestEndpoint();
+    ASSERT_TRUE(world->add_occupant(Vector(0,0,1), Vector(0,0,0), ept1));
+    create_transport_tube(Vector(0,0,1), 1);
+    connect_endpoint(1, Vector(0,0,1), ept1, 1);
 
+    // find the transport tube at (0,0,1)
+    std::vector<TransportTube*> tubes;
+    for (VoxelOccupant *entry : world->get_occupants(Vector(0,0,1))) {
+        if (entry->is_transport_tube()) {
+            tubes.push_back((TransportTube*)entry);
+        }
+    }
+    ASSERT_EQ(1, tubes.size()) << "could not find transport tube at test location";
+    TransportTube *transport = tubes.at(0);
+    ASSERT_EQ(1, transport->get_number_of_connected_devices()) << "wrong number of devices connected to transport tube";
+    ASSERT_TRUE(transport->get_connectionA() == ept1 || transport->get_connectionB() == ept1) << "ept1 not connected to transport";
+    ASSERT_EQ(transport, ept1->get_connected_transport(1)) << "transport not connected to ept1";
 }
 
 TEST_F (TestTransportTubes, Send_HalfDuplex) {
