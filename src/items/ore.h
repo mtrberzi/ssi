@@ -12,6 +12,7 @@ public:
 
 	virtual uint16_t get_kind() const { return 1; }
 	virtual uint32_t get_type() const { return get_material()->get_type(); }
+	virtual bool is_ore() const { return true; }
 };
 
 #endif // _ITEMS_ORE_

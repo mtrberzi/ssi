@@ -115,7 +115,7 @@ public:
     // TODO item durability
     virtual int32_t get_maximum_durability() const { return 1; }
 
-
+    virtual bool is_ore() const { return false; }
 protected:
     Material *material;
 };
