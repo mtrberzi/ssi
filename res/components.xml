@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components>
+	<component name="bar" type="1"></component>
+	<component name="plate" type="2"></component>
+	<component name="transport tube segment" type="3"></component>
+	<component name="actuator" type="4"></component>
+	<component name="fabricator machine frame" type="5"></component>
+	<component name="photon thruster" type="6"></component>
+	<component name="field assembly device" type="7"></component>
+	<component name="light arm" type="8"></component>
+	<component name="engineering robot frame Mk.I" type="9"></component>
+	<component name="wire" type="10"></component>
+	<component name="mining robot frame Mk.I" type="11"></component>
+	<component name="G-class beam focuser" type="12"></component>
+	<component name="crystal" type="13"></component>
+</components>
