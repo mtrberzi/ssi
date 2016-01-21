@@ -25,6 +25,7 @@ public:
 	~ComponentLibrary();
 
 	bool load(std::string filepath);
+	void clear();
 
 	void add_component(ComponentBuilder *builder);
 	bool contains_component(std::string name) const;

@@ -1,4 +1,5 @@
 #include "smelter.h"
+#include "component_library.h"
 
 Smelter::Smelter()
 : state(STATE_LOAD), currentOre(NULL), smeltingTimeLeft(0) {

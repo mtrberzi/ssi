@@ -2,6 +2,12 @@ find_package (Threads REQUIRED)
 find_package (GTest REQUIRED)
 include_directories (${GTEST_INCLUDE_DIRS})
 
+## Items tests
+
+add_executable (test_items_component_library test_items_component_library.cc)
+target_link_libraries (test_items_component_library ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} items)
+add_test (TestItems_ComponentLibrary test_items_component_library "${SSI_SOURCE_DIR}/../res/components.xml")
+
 ## MCU tests
 
 add_executable (test_mcu test_mcu.cc)
