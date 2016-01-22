@@ -19,11 +19,12 @@ public:
 	Material *testMaterial;
 	Smelter *smelter;
 	TestUtilSourceEndpoint *sourceEpt;
+	TestUtilSinkEndpoint *sinkEpt;
 
 	Vector smelter_position;
 
 	TestSmelter()
-	: world(NULL), testMaterial(NULL), smelter(NULL), sourceEpt(NULL),
+	: world(NULL), testMaterial(NULL), smelter(NULL), sourceEpt(NULL), sinkEpt(NULL),
 	  smelter_position(1,0,1)
 	{}
 
@@ -97,6 +98,17 @@ public:
     	connect_transport_tubes(1, source_position, smelter_position);
     	connect_endpoint(1, smelter_position, smelter, 0);
     	connect_endpoint(1, source_position, sourceEpt, 0);
+    }
+
+    void create_and_attach_sink() {
+    	sinkEpt = new TestUtilSinkEndpoint();
+    	Vector sink_position = smelter_position + Vector(1,0,0);
+    	ASSERT_TRUE(world->add_occupant(sink_position, Vector(0,0,0), sinkEpt));
+    	create_transport_tube(smelter_position, 2);
+    	create_transport_tube(sink_position, 2);
+    	connect_transport_tubes(2, sink_position, smelter_position);
+    	connect_endpoint(2, smelter_position, smelter, 1);
+    	connect_endpoint(2, sink_position, sinkEpt, 0);
     }
 };
 
@@ -181,13 +193,50 @@ TEST_F(TestSmelter, ValidItem_Accepted) {
 TEST_F(TestSmelter, ValidItem_Smelted) {
 	place_smelter();
 	create_and_attach_source();
-	FAIL() << "not implemented yet";
+	Item *i = new Ore(testMaterial);
+	sourceEpt->queue_send(i);
+	world->timestep();
+	world->timestep();
+	world->timestep();
+	// we should now be smelting
+	ASSERT_EQ(Smelter::STATE_SMELT, smelter->get_state());
+	// step until we're done
+	for (uint32_t t = 0; t < NUMBER_OF_TIMESTEPS_TO_SMELT; ++t) {
+		world->timestep();
+	}
+	ASSERT_EQ(Smelter::STATE_OUTPUT, smelter->get_state());
 }
 
 TEST_F(TestSmelter, Output_Correct) {
 	place_smelter();
 	create_and_attach_source();
-	FAIL() << "not implemented yet";
+	create_and_attach_sink();
+	Item *i = new Ore(testMaterial);
+	sourceEpt->queue_send(i);
+	world->timestep();
+	world->timestep();
+	world->timestep();
+	// we should now be smelting
+	ASSERT_EQ(Smelter::STATE_SMELT, smelter->get_state());
+	// step until we're done
+	for (uint32_t t = 0; t < NUMBER_OF_TIMESTEPS_TO_SMELT; ++t) {
+		world->timestep();
+	}
+	ASSERT_EQ(Smelter::STATE_OUTPUT, smelter->get_state());
+	// each bar should take 3 timesteps to show up at the sink
+	for (uint32_t t = 0; t < 3*NUMBER_OF_BARS_TO_PRODUCE; ++t) {
+		world->timestep();
+	}
+	std::vector<Item*> receivedItems = sinkEpt->get_receive_queue();
+	// check that we received the correct number of items
+	ASSERT_EQ(NUMBER_OF_BARS_TO_PRODUCE, receivedItems.size());
+	// check that each item is a component named "bar" made out of our test material
+	for (Item *i : receivedItems) {
+		ASSERT_TRUE(i->is_component());
+		Component *comp = (Component*)i;
+		ASSERT_EQ(std::string("bar"), comp->get_component_name());
+		ASSERT_EQ(testMaterial, comp->get_material());
+	}
 }
 
 int main (int argc, char **argv) {

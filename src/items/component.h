@@ -14,6 +14,7 @@ public:
 	virtual uint16_t get_kind() const { return 2; }
 	virtual uint32_t get_type() const { return type; }
 	std::string get_component_name() const { return name; }
+	virtual bool is_component() const { return true; }
 protected:
 	std::string name;
 	uint32_t type;

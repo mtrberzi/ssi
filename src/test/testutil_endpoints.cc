@@ -25,3 +25,9 @@ void TestUtilSourceEndpoint::post_send_timestep(std::unordered_map<uint32_t, boo
 		}
 	}
 }
+
+TestUtilSinkEndpoint::TestUtilSinkEndpoint() {}
+
+TestUtilSinkEndpoint::~TestUtilSinkEndpoint() {
+	// TODO delete all items
+}

@@ -4,6 +4,7 @@
 #include "transport_endpoint.h"
 #include <cstdint>
 #include <queue>
+#include <vector>
 
 // Defines transport endpoints useful for testing other devices.
 
@@ -31,6 +32,28 @@ protected:
 	uint32_t counter;
 	virtual void pre_send_timestep();
 	virtual void post_send_timestep(std::unordered_map<uint32_t, bool> results);
+};
+
+// A transport device that accepts any item through endpoint 0
+// and keeps a list of what has been received so far.
+
+class TestUtilSinkEndpoint : public TransportEndpoint {
+public:
+	TestUtilSinkEndpoint();
+	virtual ~TestUtilSinkEndpoint();
+
+	virtual uint32_t get_type() const { return 0; }
+	virtual Vector get_extents() const { return Vector(1,1,1); }
+	virtual bool has_world_updates() const { return false; }
+	virtual std::unordered_set<uint32_t> get_transport_endpoints() const { return std::unordered_set<uint32_t>{0}; }
+	virtual bool receive_to_endpoint(uint32_t endpoint, Item *item) {
+		receiveQueue.push_back(item);
+		return true;
+	}
+
+	std::vector<Item*> get_receive_queue() const { return receiveQueue; }
+protected:
+	std::vector<Item*> receiveQueue;
 };
 
 #endif // _TESTUTIL_ENDPOINTS_

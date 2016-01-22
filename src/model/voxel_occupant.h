@@ -116,6 +116,7 @@ public:
     virtual int32_t get_maximum_durability() const { return 1; }
 
     virtual bool is_ore() const { return false; }
+    virtual bool is_component() const { return false; }
 protected:
     Material *material;
 };
