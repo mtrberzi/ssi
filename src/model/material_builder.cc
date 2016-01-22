@@ -1,5 +1,6 @@
 #include "material_builder.h"
 #include <cstdlib>
+#include <cstring>
 
 MaterialBuilder::MaterialBuilder()
 : name(""), type(0), durability_modifier(0.0),
@@ -40,4 +41,22 @@ void MaterialBuilder::set_durability_modifier(const char *mod) {
 
 void MaterialBuilder::add_category(const char *cat) {
     categories.push_back(std::string(cat));
+}
+
+void MaterialBuilder::set_can_be_smelted(const char *b) {
+	if (strcmp(b, "true") == 0) {
+		can_smelt = true;
+	} else {
+		can_smelt = false;
+	}
+}
+
+void MaterialBuilder::set_smelting_timesteps(const char *steps) {
+	unsigned long ul = strtoul(steps, NULL, 10);
+	smelting_timesteps = (uint32_t)ul;
+}
+
+void MaterialBuilder::set_number_of_smelted_bars(const char *bars) {
+	unsigned long ul = strtoul(bars, NULL, 10);
+	number_of_smelted_bars = (uint32_t)ul;
 }

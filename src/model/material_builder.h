@@ -17,7 +17,11 @@ public:
     void set_type(const char *tp);
     void set_durability_modifier(const char *mod);
     void add_category(const char *category);
-    // TODO canBeSmelted, smeltingTimesteps, numberOfSmeltedBars
+
+    void set_can_be_smelted(const char *b);
+    void set_smelting_timesteps(const char *steps);
+    void set_number_of_smelted_bars(const char *bars);
+
     // TODO add mining products
 
 protected:

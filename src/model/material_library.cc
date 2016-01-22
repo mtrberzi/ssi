@@ -104,7 +104,6 @@ static void end_document(void *ud) {
 }
 
 static void chars(void *ud, const xmlChar *ch, int len) {
-    // TODO characters
 }
 
 static void start_element(void *ud, const xmlChar *utfname, const xmlChar **attrs) {
@@ -125,10 +124,15 @@ static void start_element(void *ud, const xmlChar *utfname, const xmlChar **attr
                 parser->current_material->set_type(value);
             } else if (strcmp(key, "durabilityModifier") == 0) {
                 parser->current_material->set_durability_modifier(value);
+            } else if (strcmp(key, "canBeSmelted") == 0) {
+            	parser->current_material->set_can_be_smelted(value);
+            } else if (strcmp(key, "smeltingTimesteps") == 0) {
+            	parser->current_material->set_smelting_timesteps(value);
+            } else if (strcmp(key, "numberOfSmeltedBars") == 0) {
+            	parser->current_material->set_number_of_smelted_bars(value);
             } else {
                 // TODO warn about unknown attribute
             }
-            // TODO attributes: canBeSmelted, smeltingTimesteps, numberOfSmeltedBars
         }
     } else if (strcmp(name, "categories") == 0 && parser->stack.top() == S_MATERIAL_DEFINITION) {
         parser->stack.push(S_MATERIAL_CATEGORIES);

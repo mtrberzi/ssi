@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <materials>
-	<material name="iron" type="2" durabilityModifier="0.9">
+	<material name="iron" type="2" durabilityModifier="0.9" 
+		canBeSmelted="true" smeltingTimesteps="40" numberOfSmeltedBars="3">
 		<categories>
 			<category name="metal"/>
 		</categories>

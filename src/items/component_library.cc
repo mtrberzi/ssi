@@ -85,7 +85,6 @@ static void end_document(void *ud) {
 }
 
 static void chars(void *ud, const xmlChar *ch, int len) {
-    // TODO characters
 }
 
 static void start_element(void *ud, const xmlChar *utfname, const xmlChar **attrs) {
