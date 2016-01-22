@@ -99,8 +99,6 @@ public:
     World *world;
 };
 
-// TODO port the rest of IntTestTransportTubes here
-
 TEST_F (TestTransportTubes, UnconnectedEndpoint_CannotSend) {
     TestEndpoint *ept1 = new TestEndpoint();
     ASSERT_TRUE(world->add_occupant(Vector(0,0,1), Vector(0,0,0), ept1));

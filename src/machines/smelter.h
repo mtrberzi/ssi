@@ -32,12 +32,14 @@ public:
 
 	Ore* get_current_ore() const { return currentOre;}
 	uint32_t get_smelting_time_remaining() const { return smeltingTimeLeft; }
-protected:
+
 	enum SmelterState {
 		STATE_LOAD, // waiting to receive ore
 		STATE_SMELT, // smelting ore
 		STATE_OUTPUT // waiting to output bars
 	};
+	SmelterState get_state() const { return state; }
+protected:
 	SmelterState state;
 	Ore *currentOre;
 	uint32_t smeltingTimeLeft;

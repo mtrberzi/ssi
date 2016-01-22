@@ -8,6 +8,12 @@ add_executable (test_items_component_library test_items_component_library.cc)
 target_link_libraries (test_items_component_library ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} items)
 add_test (TestItems_ComponentLibrary test_items_component_library "${SSI_SOURCE_DIR}/../res/components.xml")
 
+## Machines tests
+
+add_executable (test_machines_smelter test_machines_smelter.cc testutil_endpoints.h testutil_endpoints.cc)
+target_link_libraries (test_machines_smelter ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} machines model items)
+add_test (TestMachines_Smelter test_machines_smelter)
+
 ## MCU tests
 
 add_executable (test_mcu test_mcu.cc)
