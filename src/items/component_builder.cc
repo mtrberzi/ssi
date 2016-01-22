@@ -19,3 +19,12 @@ Component *ComponentBuilder::build(Material *material) {
 	if (!can_build()) return NULL;
 	return new Component(material, componentName, type);
 }
+
+void ComponentBuilder::set_name(const char *nm) {
+	componentName.assign(nm);
+}
+
+void ComponentBuilder::set_type(const char *tp) {
+    unsigned long ul = strtoul(tp, NULL, 10);
+    type = (uint32_t)ul;
+}

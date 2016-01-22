@@ -13,12 +13,8 @@ public:
 	bool can_build() const;
 	Component *build(Material *mat);
 
-	void set_component_name(std::string name) {
-		componentName = name;
-	}
-	void set_type(uint32_t t) {
-		type = t;
-	}
+	void set_name(const char *nm);
+	void set_type(const char *tp);
 
 	std::string get_component_name() const {
 		return componentName;
