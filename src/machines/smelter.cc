@@ -29,7 +29,7 @@ bool Smelter::receive_to_endpoint(uint32_t eptID, Item *item) {
 	}
 	Ore *ore = (Ore*)item;
 	// the ore has to be something we can smelt
-	if (ore->get_material()->can_be_smelted()) {
+	if (!(ore->get_material()->can_be_smelted())) {
 		return false;
 	}
 	// okay, receive input and start smelting

@@ -8,6 +8,7 @@
 #include "transport_endpoint.h"
 #include "world_updates.h"
 #include "testutil_endpoints.h"
+#include "ore.h"
 
 static const uint32_t NUMBER_OF_TIMESTEPS_TO_SMELT = 10;
 static const uint32_t NUMBER_OF_BARS_TO_PRODUCE = 4;
@@ -114,13 +115,67 @@ TEST_F(TestSmelter, ConnectInput) {
 TEST_F(TestSmelter, InvalidItem_Rejected) {
 	place_smelter();
 	create_and_attach_source();
-	FAIL() << "not implemented yet";
+
+	Item *i = ComponentLibrary::inst()->create_component("foo", testMaterial);
+	sourceEpt->queue_send(i);
+	world->timestep();
+	world->timestep();
+	// the item should be in the tube right before the smelter
+	auto occupants = world->get_occupants(smelter_position);
+	TransportTube *transport = NULL;
+	for (VoxelOccupant *occ : occupants) {
+		if (occ->is_transport_tube()) {
+			transport = (TransportTube*)occ;
+			break;
+		}
+	}
+	ASSERT_TRUE(transport != NULL);
+	{
+		auto contents = transport->get_contents();
+		ASSERT_TRUE(find(contents.begin(), contents.end(), i) != contents.end());
+	}
+	// step again; the item should still be there
+	world->timestep();
+	{
+		auto contents = transport->get_contents();
+		ASSERT_TRUE(find(contents.begin(), contents.end(), i) != contents.end());
+	}
+	// smelter should still be trying to load
+	ASSERT_EQ(Smelter::STATE_LOAD, smelter->get_state());
 }
 
 TEST_F(TestSmelter, ValidItem_Accepted) {
 	place_smelter();
 	create_and_attach_source();
-	FAIL() << "not implemented yet";
+	Item *i = new Ore(testMaterial);
+	sourceEpt->queue_send(i);
+	world->timestep();
+	world->timestep();
+	// the item should be in the tube right before the smelter
+	auto occupants = world->get_occupants(smelter_position);
+	TransportTube *transport = NULL;
+	for (VoxelOccupant *occ : occupants) {
+		if (occ->is_transport_tube()) {
+			transport = (TransportTube*)occ;
+			break;
+		}
+	}
+	ASSERT_TRUE(transport != NULL);
+	{
+		auto contents = transport->get_contents();
+		ASSERT_TRUE(find(contents.begin(), contents.end(), i) != contents.end())
+			<< "item not found in expected transport tube";
+	}
+	// step again; the item should be gone
+	world->timestep();
+	{
+		auto contents = transport->get_contents();
+		ASSERT_TRUE(find(contents.begin(), contents.end(), i) == contents.end())
+			<< "item not accepted by smelter";
+	}
+	// smelter should now be smelting
+	ASSERT_EQ(Smelter::STATE_SMELT, smelter->get_state());
+	ASSERT_EQ(i, smelter->get_current_ore());
 }
 
 TEST_F(TestSmelter, ValidItem_Smelted) {
