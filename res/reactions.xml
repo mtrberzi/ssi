@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reactions>
+	<reaction id="1" name="Form metal plates" time="80">
+		<categories>
+			<category name="fabricator-1" />
+		</categories>
+		<reactants>
+			<reactant quantity="1">
+				<component name="bar" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="8">
+				<component name="plate" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="2" name="Form transport tube segment" time="20">
+		<categories>
+			<category name="fabricator-1"/>
+		</categories>
+		<reactants>
+			<reactant quantity="1">
+				<component name="plate" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="1">
+				<component name="transport tube segment" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="3" name="Fabricate actuator" time="30">
+		<categories>
+			<category name="fabricator-1"/>
+		</categories>
+		<reactants>
+			<reactant quantity="1">
+				<component name="plate" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="1">
+				<component name="actuator" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="4" name="Form fabricator machine frame" time="100">
+		<categories>
+			<category name="fabricator-1"/>
+		</categories>
+		<reactants>
+			<reactant quantity="6">
+				<component name="plate" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="1">
+				<component name="fabricator machine frame" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="5" name="Draw metal wire" time="20">
+		<categories>
+			<category name="fabricator-1"/>
+		</categories>
+		<reactants>
+			<reactant quantity="1">
+				<component name="bar"/>
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="5">
+				<component name="wire" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="6" name="Build photon thruster" time="50">
+		<categories>
+			<category name="part-builder-1"/>
+		</categories>
+		<reactants>
+			<reactant quantity="2">
+				<component name="plate" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+			<reactant quantity="1">
+				<component name="wire" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="1">
+				<component name="photon thruster" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="7" name="Build light arm" time="75">
+		<categories>
+			<category name="part-builder-1"/>
+		</categories>
+		<reactants>
+			<reactant quantity="1">
+				<component name="plate" />
+			</reactant>
+			<reactant quantity="1">
+				<component name="wire" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+			<reactant quantity="1">
+				<component name="actuator" />
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="1">
+				<component name="light arm" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="8" name="Build field assembly device" time="200">
+		<categories>
+			<category name="part-builder-1"/>
+		</categories>
+		<reactants>
+			<reactant quantity="2">
+				<component name="light arm" />
+			</reactant>
+			<reactant quantity="4">
+				<component name="plate" />
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="1">
+				<component name="field assembly device" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="9" name="Construct engineering robot frame Mk.I" time="150">
+		<categories>
+			<category name="part-builder-1"/>
+		</categories>
+		<reactants>
+			<reactant quantity="6">
+				<component name="plate" />
+			</reactant>
+			<reactant quantity="4">
+				<component name="wire" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="1">
+				<component name="engineering robot frame Mk.I" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="10" name="Build engineering robot Mk.I" time="200">
+		<categories>
+			<category name="robot-assembly-1"/>
+		</categories>
+		<reactants>
+			<!-- TODO MCU requirement -->
+			<!-- TODO power supply requirement -->
+			<reactant quantity="1">
+				<component name="engineering robot frame Mk.I" />
+			</reactant>
+			<reactant quantity="6">
+				<component name="photon thruster" />
+			</reactant>
+			<reactant quantity="1">
+				<component name="field assembly device" />
+			</reactant>
+			<reactant quantity="1">
+				<component name="light arm" />
+			</reactant>
+		</reactants>
+		<createdObjects>
+			<robot class="io.lp0onfire.ssi.model.robots.EngineeringRobotMarkOne">
+				<!-- TODO robot modules, materials, etc. -->
+			</robot>
+		</createdObjects>
+	</reaction>
+	
+	<reaction id="11" name="Construct rapid fabricator" time="1">
+		<categories>
+			<category name="construction-1"/>
+		</categories>
+		<reactants>
+			<reactant quantity="1">
+				<component name="fabricator machine frame" />
+			</reactant>
+			<reactant quantity="1">
+				<component name="actuator"/>
+			</reactant>
+		</reactants>
+		<createdObjects>
+			<machine class="io.lp0onfire.ssi.model.machines.RapidFabricator" mcu="false">
+				<!-- TODO materials, etc. -->
+			</machine>
+		</createdObjects>
+	</reaction>
+	
+	<reaction id="12" name="Construct mining robot frame Mk.I" time="180">
+		<categories>
+			<category name="part-builder-1"/>
+		</categories>
+		<reactants>
+			<reactant quantity="10">
+				<component name="plate" />
+			</reactant>
+			<reactant quantity="5">
+				<component name="wire" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="1">
+				<component name="mining robot frame Mk.I" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="13" name="Build G-class beam focuser" time="100">
+		<categories>
+			<category name="part-builder-1" />
+		</categories>
+		<reactants>
+			<reactant quantity="4">
+				<component name="plate" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+			<reactant quantity="1">
+				<component name="wire" />
+				<constraints>
+					<materialCategoryConstraint category="metal" />
+				</constraints>
+			</reactant>
+			<reactant quantity="1">
+				<component name="crystal" />
+				<constraints>
+					<materialConstraint name="quartz" />
+				</constraints>
+			</reactant>
+		</reactants>
+		<products>
+			<product quantity="1">
+				<component name="G-class beam focuser" />
+				<copyMaterial index="0" />
+			</product>
+		</products>
+	</reaction>
+	
+	<reaction id="14" name="Build mining robot Mk.I" time="200">
+		<categories>
+			<category name="robot-assembly-1"/>
+		</categories>
+		<reactants>
+			<!-- TODO MCU requirement -->
+			<!-- TODO power supply requirement -->
+			<reactant quantity="1">
+				<component name="mining robot frame Mk.I" />
+			</reactant>
+			<reactant quantity="6">
+				<component name="photon thruster" />
+			</reactant>
+			<reactant quantity="1">
+				<component name="G-class beam focuser" />
+			</reactant>
+			<reactant quantity="1">
+				<component name="light arm" />
+			</reactant>
+		</reactants>
+		<createdObjects>
+			<robot class="io.lp0onfire.ssi.model.robots.MiningRobotMarkOne">
+				<!-- TODO robot modules, materials, etc. -->
+			</robot>
+		</createdObjects>
+	</reaction>
+	
+</reactions>
