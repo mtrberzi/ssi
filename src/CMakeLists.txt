@@ -27,6 +27,7 @@ add_subdirectory (mcu)
 add_subdirectory (model)
 add_subdirectory (items)
 add_subdirectory (machines)
+add_subdirectory (reactions)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   enable_testing()
